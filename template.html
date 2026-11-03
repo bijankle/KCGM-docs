@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Library Downloader</title>
+<style>
+:root{--bg:#f6f5f1;--panel:#fff;--ink:#22221f;--mute:#6b6a64;--line:#dddbd2;--soft:#efede6;--acc:#0f6e56;--acc-soft:#e1f5ee;--acc-ink:#085041;--warn:#854f0b;--warn-soft:#faeeda;--bad:#a32d2d;--row-sel:#e9f6f0}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1b19;--panel:#24241f;--ink:#ecebe6;--mute:#a19f97;--line:#3a3934;--soft:#2e2d29;--acc:#5dcaa5;--acc-soft:#0f3b30;--acc-ink:#bfeedd;--warn:#efb35a;--warn-soft:#3a2c14;--bad:#f09595;--row-sel:#1d3a31}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:14px/1.4 "Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 11px;cursor:pointer}
+button:hover{border-color:var(--mute)}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+@media (prefers-color-scheme:dark){button.pri{color:#04342c}}
+button:disabled{opacity:.45;cursor:default}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:600}
+header .src{color:var(--mute);font-size:12px}
+header .sp{flex:1}
+.wrap{flex:1;display:flex;min-height:0}
+aside{width:300px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:12px 14px}
+aside h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin:16px 0 6px;display:flex;justify-content:space-between;align-items:center}
+aside h3 a{text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer;color:var(--acc)}
+.pills{display:flex;flex-wrap:wrap;gap:5px}
+.pill{border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:2px 9px;font-size:12px;cursor:pointer;user-select:none;white-space:nowrap}
+.pill i{font-style:normal;color:var(--mute);margin-left:4px;font-size:11px}
+.pill.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.pill.on i{color:inherit;opacity:.8}
+@media (prefers-color-scheme:dark){.pill.on{color:#04342c}}
+.pill.zero{opacity:.4}
+.more{font-size:12px;color:var(--acc);cursor:pointer;margin-top:4px;display:inline-block}
+.tog{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0;cursor:pointer}
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+.bar{display:flex;gap:8px;align-items:center;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--panel)}
+.bar input[type=search]{flex:1;min-width:220px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.count{color:var(--mute);font-size:13px;white-space:nowrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px}
+.chips:not(:empty){padding:8px 14px;border-bottom:1px solid var(--line)}
+.chip{font-size:12px;background:var(--acc-soft);color:var(--acc-ink);border-radius:999px;padding:2px 4px 2px 9px}
+.chip b{cursor:pointer;padding:0 5px;font-weight:600}
+.thead,.row{display:grid;grid-template-columns:36px minmax(170px,230px) 48px 58px minmax(200px,1fr) 64px 56px;align-items:center}
+.thead{font-size:12px;color:var(--mute);border-bottom:1px solid var(--line);background:var(--panel);padding-right:12px}
+.thead div{padding:7px 6px;cursor:pointer;white-space:nowrap}
+.thead div.s::after{content:" \25B4"}.thead div.s.d::after{content:" \25BE"}
+#vp{flex:1;overflow:auto;position:relative;background:var(--panel)}
+#sz{position:relative}
+.row{position:absolute;left:0;right:0;height:30px;border-bottom:1px solid var(--soft);font-size:13px}
+.row:hover{background:var(--soft)}
+.row.sel{background:var(--row-sel)}
+.row div{padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .num{font-family:Consolas,ui-monospace,monospace;font-size:12px}
+.row .st{font-size:11px}
+.row a{color:var(--acc);text-decoration:none}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);margin-left:6px;vertical-align:middle}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--acc);cursor:pointer;margin:0}
+.empty{padding:40px;text-align:center;color:var(--mute)}
+footer{display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line);flex-wrap:wrap}
+footer label{font-size:13px;color:var(--mute);display:flex;gap:6px;align-items:center}
+footer select,footer input[type=number]{padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+footer input[type=number]{width:60px}
+.prog{flex:1;min-width:160px;display:flex;align-items:center;gap:8px}
+.track{flex:1;height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--acc);transition:width .2s}
+#msg{font-size:13px;padding:8px 14px;background:var(--warn-soft);color:var(--warn);display:none}
+#msg.on{display:block}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);max-width:520px}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+.help{font-size:13px;color:var(--mute)}
+.help ol{padding-left:18px;margin:6px 0}
+@media (max-width:800px){aside{display:none}.thead,.row{grid-template-columns:32px 150px 40px 50px 1fr 0 44px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Project Library Downloader</h1>
+  <span class="src" id="src"></span>
+  <span class="sp"></span>
+  <button id="helpBtn">How it works</button>
+  <button class="pri" id="pasteBtn">Paste a list</button>
+  <button id="upBtn">Update register</button>
+  <button id="resetBtn" style="display:none">Use built in register</button>
+  <input type="file" id="upFile" accept=".xlsx,.xlsm,.xls,.csv" hidden>
+</header>
+<div id="msg"></div>
+<div class="wrap">
+  <aside id="side">
+    <label class="tog"><input type="checkbox" id="hideSup" checked> Hide superseded, cancelled and markups</label>
+    <label class="tog"><input type="checkbox" id="onlyLink" checked> Only items with a link</label>
+    <label class="tog"><input type="checkbox" id="onlySel"> Show ticked only</label>
+    <div id="groups"></div>
+  </aside>
+  <main>
+    <div class="bar">
+      <input type="search" id="q" placeholder="Search every column, e.g. CV-402 tail, drift switch, F12 DRG">
+      <span class="count" id="count"></span>
+      <button id="tickAll">Tick all shown</button>
+      <button id="untickAll">Untick all shown</button>
+      <button id="clearF">Clear filters</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="thead" id="thead">
+      <div><input type="checkbox" id="hdrChk" title="Tick or untick all shown"></div>
+      <div data-k="num">Doc number</div><div data-k="rev">Rev</div><div data-k="st">Status</div><div data-k="t">Title</div><div data-k="ext">File</div><div></div>
+    </div>
+    <div id="vp"><div id="sz"></div></div>
+  </main>
+</div>
+<footer>
+  <strong id="selCount">0 ticked</strong>
+  <button id="clearSel">Clear ticks</button>
+  <button id="copyBtn">Copy links</button>
+  <button id="csvBtn">Export list</button>
+  <label>Method <select id="method"><option value="tab">New tab per file</option><option value="frame">Background</option></select></label>
+  <label>Gap <input type="number" id="gap" min="0.3" step="0.1" value="1.5"> s</label>
+  <label><input type="checkbox" id="force" checked> Force download</label>
+  <div class="prog"><div class="track"><div class="fill" id="fill"></div></div><span class="count" id="progT"></span></div>
+  <button id="testBtn">Test one file</button>
+  <button id="stopBtn" style="display:none">Stop</button>
+  <button class="pri" id="dlBtn">Download all ticked</button>
+</footer>
+<dialog id="paste" style="max-width:760px;width:92vw">
+  <h3 style="margin-top:0">Paste a list of files</h3>
+  <p class="help" style="margin:0 0 8px">One per line. Doc numbers or file names both work, with or without revision and extension, e.g. 2000-F12-DRG-ME-10456 or 2000-F12-DRG-ME-10456_0_APP.pdf. The latest revision of each is picked. Numbered revisions rank above lettered ones, so Rev 0 beats Rev C.</p>
+  <textarea id="pasteTxt" rows="8" style="width:100%;font:12px Consolas,ui-monospace,monospace;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)"></textarea>
+  <div style="display:flex;gap:8px;margin:8px 0;align-items:center"><button id="matchBtn">Match</button><span class="count" id="matchSum"></span></div>
+  <div id="matchOut" style="max-height:38vh;overflow:auto;font-size:12px"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+    <button id="copyMiss" style="display:none">Copy not found</button>
+    <button id="pasteClose">Close</button>
+    <button id="pasteTick" disabled>Tick matched</button>
+    <button class="pri" id="pasteDl" disabled>Tick and download</button>
+  </div>
+</dialog>
+<dialog id="help">
+  <h3 style="margin-top:0">How it works</h3>
+  <div class="help">
+  <ol>
+    <li>Open this file in the browser you use for SharePoint, and make sure you are signed in to SharePoint in another tab.</li>
+    <li>Search and use the pills to narrow the list. Pills in the same group widen the match, pills in different groups narrow it.</li>
+    <li>Tick the items you want. Ticks are remembered in this browser.</li>
+    <li>Click <b>Test one file</b> first. If the browser asks to allow pop ups or multiple downloads from this page, choose Allow.</li>
+    <li>Or click <b>Paste a list</b>, paste doc numbers or file names one per line, then Tick and download. The latest revision of each is used.</li>
+    <li>Click <b>Download all ticked</b>. Each file is opened one after the other with a short gap. Leave the page open until the bar is full.</li>
+  </ol>
+  <p>If nothing arrives with the Background method, switch to New tab per file. Force download asks SharePoint to save the file rather than preview it. If files open in a preview instead of saving, untick it to see whether the links work at all.</p>
+  <p>Update register loads a newer copy of the register (.xlsm, .xlsx or .csv with URL, Doc Number, Rev, Status and Title columns). It is kept in this browser until you choose Use built in register.</p>
+  </div>
+  <form method="dialog" style="text-align:right"><button class="pri">OK</button></form>
+</dialog>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const LSK="pld_ticks_v1";
+const SUP_ST=new Set(["RLM","GLM","SSD","CAN"]);
+const GROUPS=[["st","Status"],["type","Doc type"],["disc","Discipline"],["area","Area"],["pkg","Package"],["lib","Library"],["ext","File type"]];
+const SHOW=14;
+let ROWS=[],shown=[],sortK="num",sortD=1,source="",builtIn=true;
+const fsel={};GROUPS.forEach(g=>fsel[g[0]]=new Set());
+const expanded={};
+let ticks=new Set(),done=new Set();
+try{ticks=new Set(JSON.parse(localStorage.getItem(LSK)||"[]"))}catch(e){}
+function saveTicks(){try{localStorage.setItem(LSK,JSON.stringify([...ticks]))}catch(e){}}
+
+function attrs(num,url,name){
+  const toks=num.split(/[-\\_ ]+/).filter(Boolean);
+  let area="",pkg="",type="",disc="";
+  for(const t of toks){if(!area&&/^F\d\d$/.test(t))area=t;if(!pkg&&/^[A-Z]{2}\d{3}[A-Z]?$/.test(t))pkg=t;}
+  let firstNum=toks.findIndex((t,i)=>i>0&&/^\d+$/.test(t)&&t.length>=3);
+  if(firstNum<0)firstNum=toks.length;
+  let ti=-1;
+  for(let i=1;i<firstNum;i++){if(/^[A-Z]{3}$/.test(toks[i])||/^[A-Z]\d\d$/.test(toks[i]))ti=i;}
+  if(ti>=0){type=toks[ti];if(toks[ti+1]&&/^[A-Z]{2}$/.test(toks[ti+1]))disc=toks[ti+1];}
+  if(!disc){const d=toks.find(t=>/^[A-Z]{2}$/.test(t));if(d)disc=d;}
+  const m=url.match(/KCGM Controlled Library\/([^/]+)/i);
+  const lib=m?m[1]:(url?url.replace(/^https?:\/\/[^/]+\//,"").split("/").slice(0,4).pop()||"":"");
+  const em=(name||url).match(/\.([A-Za-z0-9]{2,5})$/);
+  const ext=em?em[1].toUpperCase():"";
+  return{area,pkg,type,disc,lib,ext};
+}
+function mk(name,url,num,rev,st,t){
+  const a=attrs(num||name,url,name);
+  const sup=SUP_ST.has(st)||/\/superseded\//i.test(url)||/-(RLM|GLM)\d*$/i.test(num);
+  const key=num||name||url;
+  const r={name,u:url,num,rev,st,t,...a,sup,key};
+  r.hay=[name,num,rev,st,t,url,a.area,a.pkg,a.type,a.disc,a.lib,a.ext].join(" \u0001 ").toLowerCase();
+  return r;
+}
+function loadPacked(d){
+  const F=d.folders;
+  ROWS=d.rows.map(x=>{const url=x[1]>=0?F[x[1]]+"/"+(x[2]||x[0]):"";return mk(x[0],url,x[3],x[4],x[5],x[6]);});
+  source=d.source||"";
+}
+function linkOf(r,force){
+  if(!r.u)return"";
+  let u=r.u.replace(/ /g,"%20").replace(/#/g,"%23");
+  if(force)u+=(u.includes("?")?"&":"?")+"download=1";
+  return u;
+}
+
+/* filtering */
+function baseOk(r,qt){
+  if($("hideSup").checked&&r.sup)return false;
+  if($("onlyLink").checked&&!r.u)return false;
+  if($("onlySel").checked&&!ticks.has(r.key))return false;
+  for(const w of qt)if(!r.hay.includes(w))return false;
+  return true;
+}
+function groupOk(r,skip){
+  for(const [k] of GROUPS){if(k===skip)continue;const s=fsel[k];if(s.size&&!s.has(r[k]||"(none)"))return false;}
+  return true;
+}
+function apply(){
+  const qt=$("q").value.toLowerCase().split(/\s+/).filter(Boolean);
+  const base=ROWS.filter(r=>baseOk(r,qt));
+  shown=base.filter(r=>groupOk(r,null));
+  const counts={};GROUPS.forEach(([k])=>counts[k]=new Map());
+  for(const r of base){for(const [k] of GROUPS){if(groupOk(r,k)){const v=r[k]||"(none)";counts[k].set(v,(counts[k].get(v)||0)+1);}}}
+  const all={};GROUPS.forEach(([k])=>all[k]=new Map());
+  for(const r of ROWS){for(const [k] of GROUPS){const v=r[k]||"(none)";all[k].set(v,(all[k].get(v)||0)+1);}}
+  sortRows();renderGroups(counts,all);renderChips();renderTable();
+  $("count").textContent=shown.length.toLocaleString()+" of "+ROWS.length.toLocaleString()+" shown";
+}
+function revKey(v){v=String(v||"").trim().toUpperCase();const m=v.match(/^(\d+(?:\.\d+)?)(.*)$/);if(m)return[2,parseFloat(m[1]),m[2]];if(/^[A-Z]/.test(v))return[1,0,v];return[0,0,v];}
+function cmpRev(a,b){const x=revKey(a),y=revKey(b);return x[0]-y[0]||x[1]-y[1]||x[2].localeCompare(y[2],undefined,{numeric:true});}
+function sortRows(){
+  const k=sortK;
+  shown.sort((a,b)=>sortD*(k==="rev"?cmpRev(a.rev,b.rev):String(a[k]).localeCompare(String(b[k]),undefined,{numeric:true})));
+  document.querySelectorAll("#thead div[data-k]").forEach(d=>{d.className=d.dataset.k===k?("s"+(sortD<0?" d":"")):""});
+}
+
+/* side pills */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function renderGroups(counts,all){
+  let h="";
+  for(const [k,label] of GROUPS){
+    const vals=[...all[k].keys()].sort((a,b)=>(counts[k].get(b)||0)-(counts[k].get(a)||0)||all[k].get(b)-all[k].get(a)||a.localeCompare(b));
+    if(vals.length<=1&&vals[0]==="(none)")continue;
+    const ex=expanded[k];
+    const list=ex?vals:vals.filter((v,i)=>i<SHOW||fsel[k].has(v));
+    h+=`<h3>${label}${fsel[k].size?` <a data-clr="${k}">clear</a>`:""}</h3><div class="pills">`;
+    for(const v of list){const c=counts[k].get(v)||0;h+=`<span class="pill${fsel[k].has(v)?" on":""}${c?"":" zero"}" data-g="${k}" data-v="${esc(v)}">${esc(v)}<i>${c.toLocaleString()}</i></span>`;}
+    h+="</div>";
+    if(vals.length>SHOW)h+=`<span class="more" data-more="${k}">${ex?"Show fewer":"Show all "+vals.length}</span>`;
+  }
+  $("groups").innerHTML=h;
+}
+$("groups").addEventListener("click",e=>{
+  const p=e.target.closest(".pill");
+  if(p){const s=fsel[p.dataset.g],v=p.dataset.v;s.has(v)?s.delete(v):s.add(v);apply();return;}
+  const m=e.target.closest("[data-more]");if(m){expanded[m.dataset.more]=!expanded[m.dataset.more];apply();return;}
+  const c=e.target.closest("[data-clr]");if(c){fsel[c.dataset.clr].clear();apply();}
+});
+function renderChips(){
+  let h="";
+  for(const [k,label] of GROUPS)for(const v of fsel[k])h+=`<span class="chip">${label}: ${esc(v)}<b data-g="${k}" data-v="${esc(v)}">&times;</b></span>`;
+  $("chips").innerHTML=h;
+}
+$("chips").addEventListener("click",e=>{const b=e.target.closest("b");if(b){fsel[b.dataset.g].delete(b.dataset.v);apply();}});
+
+/* virtual table */
+const RH=30,vp=$("vp"),sz=$("sz");
+function renderTable(){
+  sz.style.height=Math.max(shown.length*RH,1)+"px";
+  if(!shown.length){sz.innerHTML='<div class="empty">Nothing matches. Try fewer words or clear some pills.</div>';sz.style.height="120px";updHdr();return;}
+  const top=vp.scrollTop,h=vp.clientHeight;
+  const a=Math.max(0,Math.floor(top/RH)-10),b=Math.min(shown.length,Math.ceil((top+h)/RH)+10);
+  let out="";
+  for(let i=a;i<b;i++){
+    const r=shown[i],on=ticks.has(r.key),lk=linkOf(r,false);
+    out+=`<div class="row${on?" sel":""}" style="top:${i*RH}px" data-i="${i}"><div><input type="checkbox"${on?" checked":""}${r.u?"":" disabled"}></div><div class="num" title="${esc(r.num)}">${esc(r.num||"(no number)")}${done.has(r.key)?'<span class="dot" title="Requested this session"></span>':""}</div><div>${esc(r.rev)}</div><div class="st">${esc(r.st)}</div><div title="${esc(r.t)}">${esc(r.t)}</div><div class="st">${esc(r.ext)}</div><div>${lk?`<a href="${esc(lk)}" target="_blank" rel="noopener">open</a>`:""}</div></div>`;
+  }
+  sz.innerHTML=out;updHdr();
+}
+let raf=0;vp.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;renderTable();})});
+window.addEventListener("resize",()=>renderTable());
+sz.addEventListener("click",e=>{
+  if(e.target.closest("a"))return;
+  const row=e.target.closest(".row");if(!row)return;
+  const r=shown[+row.dataset.i];if(!r||!r.u)return;
+  ticks.has(r.key)?ticks.delete(r.key):ticks.add(r.key);
+  saveTicks();updSel();renderTable();
+  if($("onlySel").checked)apply();
+});
+function updHdr(){const c=$("hdrChk");const linked=shown.filter(r=>r.u);const n=linked.filter(r=>ticks.has(r.key)).length;c.checked=linked.length>0&&n===linked.length;c.indeterminate=n>0&&n<linked.length;c.title=n?"Untick all "+n.toLocaleString()+" ticked here":"Tick all "+linked.length.toLocaleString()+" shown";}
+$("hdrChk").addEventListener("change",()=>{const n=shown.filter(r=>r.u&&ticks.has(r.key)).length;tickShown(n===0);});
+function tickShown(on){
+  const linked=shown.filter(r=>r.u);
+  if(on&&linked.length>500&&!confirm("Tick all "+linked.length.toLocaleString()+" items shown?")){updHdr();return;}
+  linked.forEach(r=>on?ticks.add(r.key):ticks.delete(r.key));saveTicks();updSel();apply();
+}
+$("tickAll").onclick=()=>tickShown(true);
+$("untickAll").onclick=()=>tickShown(false);
+$("thead").addEventListener("click",e=>{const d=e.target.closest("div[data-k]");if(!d)return;if(sortK===d.dataset.k)sortD=-sortD;else{sortK=d.dataset.k;sortD=1;}sortRows();renderTable();});
+function tickedRows(){return ROWS.filter(r=>ticks.has(r.key)&&r.u);}
+function updSel(){const n=tickedRows().length;$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
+$("clearSel").onclick=()=>{if(ticks.size&&confirm("Clear all "+ticks.size+" ticks?")){ticks.clear();saveTicks();updSel();apply();}};
+$("clearF").onclick=()=>{GROUPS.forEach(([k])=>fsel[k].clear());$("q").value="";apply();};
+let qT=0;$("q").addEventListener("input",()=>{clearTimeout(qT);qT=setTimeout(apply,160)});
+["hideSup","onlyLink","onlySel"].forEach(id=>$(id).addEventListener("change",apply));
+
+/* messages */
+function msg(t){const m=$("msg");m.textContent=t||"";m.className=t?"on":"";}
+
+/* export */
+$("copyBtn").onclick=async()=>{
+  const rs=tickedRows();if(!rs.length)return msg("Nothing ticked yet.");
+  const txt=rs.map(r=>linkOf(r,false)).join("\r\n");
+  try{await navigator.clipboard.writeText(txt);msg(rs.length+" links copied.");}
+  catch(e){const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");msg(rs.length+" links copied.");}catch(_){msg("Copy was blocked by the browser.");}ta.remove();}
+};
+$("csvBtn").onclick=()=>{
+  const rs=tickedRows();if(!rs.length)return msg("Nothing ticked yet.");
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const csv=["Doc Number,Rev,Status,Title,File,URL"].concat(rs.map(r=>[r.num,r.rev,r.st,r.t,r.name,linkOf(r,false)].map(q).join(","))).join("\r\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));a.download="Ticked documents.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+
+/* download run */
+let run=null;
+function fire(r){
+  const u=linkOf(r,$("force").checked);
+  if($("method").value==="tab"){const w=window.open(u,"_blank");return !!w;}
+  const f=document.createElement("iframe");f.style.display="none";f.src=u;document.body.appendChild(f);setTimeout(()=>f.remove(),120000);return true;
+}
+function setProg(i,n){$("fill").style.width=(n?100*i/n:0)+"%";$("progT").textContent=n?i+" of "+n:"";}
+function step(){
+  if(!run)return;
+  if(run.i>=run.list.length){finish("Done. "+run.list.length+" files requested. Check your downloads list (Ctrl+J) for any that did not arrive.");return;}
+  const r=run.list[run.i];
+  if(!fire(r)){msg("The browser blocked the pop up. Allow pop ups for this page (icon at the right of the address bar), then click Resume.");pause();return;}
+  done.add(r.key);run.i++;setProg(run.i,run.list.length);renderTable();
+  run.t=setTimeout(step,Math.max(300,(+$("gap").value||1.5)*1000));
+}
+function pause(){if(!run)return;clearTimeout(run.t);run.paused=true;$("stopBtn").style.display="none";$("dlBtn").textContent="Resume ("+(run.list.length-run.i)+" left)";$("dlBtn").disabled=false;}
+function finish(t){clearTimeout(run&&run.t);run=null;$("stopBtn").style.display="none";$("dlBtn").disabled=false;updSel();msg(t);}
+$("dlBtn").onclick=()=>{
+  if(run&&run.paused){run.paused=false;msg("");$("stopBtn").style.display="";$("dlBtn").disabled=true;step();return;}
+  const list=tickedRows();
+  if(!list.length)return msg("Tick some items first.");
+  if(list.length>50&&!confirm(list.length+" files is a large batch. SharePoint may throttle or the browser may struggle above about 50 at a time. Continue anyway?"))return;
+  run={list,i:0,t:0,paused:false};msg("");setProg(0,list.length);
+  $("stopBtn").style.display="";$("dlBtn").disabled=true;step();
+};
+$("stopBtn").onclick=()=>{if(run){const k=run.i;finish("Stopped after "+k+" of "+run.list.length+". Untick the ones already requested (marked with a dot) and run again to continue.");}};
+$("testBtn").onclick=()=>{
+  const r=tickedRows()[0]||shown.find(x=>x.u);
+  if(!r)return msg("Nothing to test.");
+  if(fire(r)){done.add(r.key);renderTable();msg("Test sent for "+(r.num||r.name)+". If it did not arrive within a few seconds, try the other method or untick Force download.");}
+  else msg("The browser blocked the pop up. Allow pop ups for this page, then try again.");
+};
+
+
+/* paste a list */
+const keyOf=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,"");
+let IDX=null;
+function buildIdx(){
+  IDX=new Map();
+  const add=(k,r)=>{if(!k)return;let a=IDX.get(k);if(!a)IDX.set(k,a=[]);if(!a.includes(r))a.push(r);};
+  for(const r of ROWS){
+    add(keyOf(r.num),r);
+    add(keyOf(r.num.replace(/-(RLM|GLM)\d*$/i,"")),r);
+    const nm=r.name.replace(/\.[A-Za-z0-9]{2,5}$/,"");
+    add(keyOf(nm),r);
+    add(keyOf(nm.split("_")[0]),r);
+  }
+}
+function pickLatest(c){
+  const p=c.filter(r=>r.u);if(!p.length)return null;
+  p.sort((a,b)=>cmpRev(b.rev,a.rev)||(a.sup-b.sup));
+  return p[0];
+}
+function lookup(line){
+  const raw=line.trim().replace(/^["']|["']$/g,"");if(!raw)return null;
+  const tries=[];
+  const noExt=raw.replace(/\.[A-Za-z0-9]{2,5}$/,"");
+  tries.push(noExt.split("_")[0],noExt,noExt.replace(/\s*rev\.?\s*[A-Z0-9]+$/i,""),raw);
+  for(const t of tries){const k=keyOf(t);const c=k&&IDX.get(k);if(c&&c.length){const r=pickLatest(c);return{raw,r,n:c.length,nolink:!r};}}
+  return{raw,r:null,n:0};
+}
+let pasteRes=[];
+$("pasteBtn").onclick=()=>{$("paste").showModal();$("pasteTxt").focus();};
+$("pasteClose").onclick=()=>$("paste").close();
+$("matchBtn").onclick=()=>{
+  if(!IDX)buildIdx();
+  const seen=new Set();
+  pasteRes=$("pasteTxt").value.split(/[\r\n]+/).map(lookup).filter(x=>x&&!seen.has(x.raw.toUpperCase())&&seen.add(x.raw.toUpperCase()));
+  const ok=pasteRes.filter(x=>x.r),miss=pasteRes.filter(x=>!x.r);
+  $("matchSum").textContent=ok.length+" matched, "+miss.length+" not found"+(miss.some(x=>x.nolink)?" or no link":"");
+  let h='<table style="width:100%;border-collapse:collapse">';
+  for(const x of pasteRes){
+    const r=x.r;
+    h+=`<tr style="border-bottom:1px solid var(--soft)"><td style="padding:3px 6px;font-family:Consolas,monospace">${esc(x.raw)}</td>`+
+      (r?`<td style="padding:3px 6px;color:var(--acc)">${esc(r.num)} rev ${esc(r.rev)} ${esc(r.st)}${x.n>1?` <span style="color:var(--mute)">(latest of ${x.n})</span>`:""}</td><td style="padding:3px 6px">${esc(r.t)}</td>`
+        :`<td colspan="2" style="padding:3px 6px;color:var(--bad)">${x.nolink?"On register but no link":"Not found"}</td>`)+"</tr>";
+  }
+  $("matchOut").innerHTML=h+"</table>";
+  $("pasteTick").disabled=$("pasteDl").disabled=!ok.length;
+  $("copyMiss").style.display=miss.length?"":"none";
+};
+$("copyMiss").onclick=async()=>{const t=pasteRes.filter(x=>!x.r).map(x=>x.raw).join("\r\n");try{await navigator.clipboard.writeText(t);$("matchSum").textContent+=" | copied";}catch(e){}};
+function tickPasted(){const ok=pasteRes.filter(x=>x.r);ok.forEach(x=>ticks.add(x.r.key));saveTicks();updSel();apply();return ok.map(x=>x.r);}
+$("pasteTick").onclick=()=>{const n=tickPasted().length;$("paste").close();msg(n+" items ticked from your list.");};
+$("pasteDl").onclick=()=>{
+  const list=tickPasted();$("paste").close();
+  if(run)return msg("A download is already running.");
+  if(list.length>50&&!confirm(list.length+" files is a large batch. Continue anyway?"))return;
+  run={list,i:0,t:0,paused:false};msg("");setProg(0,list.length);$("stopBtn").style.display="";$("dlBtn").disabled=true;step();
+};
+
+/* help */
+$("helpBtn").onclick=()=>$("help").showModal();
+
+/* upload update, stored in IndexedDB */
+const DBN="pld_db",ST="reg";
+function idb(){return new Promise((res,rej)=>{const o=indexedDB.open(DBN,1);o.onupgradeneeded=()=>o.result.createObjectStore(ST);o.onsuccess=()=>res(o.result);o.onerror=()=>rej(o.error);});}
+async function idbGet(){try{const d=await idb();return await new Promise(r=>{const q=d.transaction(ST).objectStore(ST).get("cur");q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);});}catch(e){return null}}
+async function idbPut(v){try{const d=await idb();await new Promise(r=>{const t=d.transaction(ST,"readwrite");v==null?t.objectStore(ST).delete("cur"):t.objectStore(ST).put(v,"cur");t.oncomplete=r;t.onerror=r;});}catch(e){}}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+$("upBtn").onclick=()=>$("upFile").click();
+$("upFile").onchange=async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  msg("Reading "+f.name+" ...");
+  try{
+    if(!window.XLSX)await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+  }catch(err){return msg("Could not load the spreadsheet reader from the internet. Save the register as .csv and upload that instead, or check your connection.");}
+  try{
+    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
+    let rows=null,hi=-1,H=null;
+    for(const n of wb.SheetNames){
+      const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:""});
+      for(let i=0;i<Math.min(a.length,20);i++){const h=a[i].map(x=>String(x).trim().toLowerCase());if(h.includes("url")&&h.some(x=>x.startsWith("doc"))){rows=a;hi=i;H=h;break;}}
+      if(rows)break;
+    }
+    if(!rows)return msg("Could not find a header row with URL and Doc Number columns.");
+    const col=(...names)=>H.findIndex(x=>names.some(n=>x===n||x.startsWith(n)));
+    const cu=col("url"),cn=col("doc number","doc no","document number","doc"),cr=col("rev"),cs=col("status"),ct=col("title");
+    const cf=H.findIndex((x,i)=>![cu,cn,cr,cs,ct].includes(i));
+    const out=[];
+    for(let i=hi+1;i<rows.length;i++){const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";if(!g(cu)&&!g(cn))continue;out.push([g(cf),g(cu),g(cn),g(cr),g(cs),g(ct)]);}
+    const pack={source:f.name+" (uploaded "+new Date().toLocaleDateString()+")",flat:out};
+    await idbPut(pack);useFlat(pack);builtIn=false;showSrc();apply();
+    msg("Loaded "+out.length.toLocaleString()+" rows from "+f.name+". Ticks carry across by document number.");
+  }catch(err){msg("Could not read that file: "+err.message);}
+};
+function useFlat(p){ROWS=p.flat.map(x=>mk(x[0],x[1],x[2],x[3],x[4],x[5]));source=p.source;IDX=null;}
+$("resetBtn").onclick=async()=>{await idbPut(null);loadPacked(BUILT);IDX=null;builtIn=true;showSrc();apply();msg("Back on the built in register.");};
+function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.toLocaleString()+" items";$("resetBtn").style.display=builtIn?"none":"";}
+
+/* start */
+const BUILT=JSON.parse($("data").textContent);
+loadPacked(BUILT);
+showSrc();updSel();apply();
+idbGet().then(p=>{if(p&&p.flat){useFlat(p);builtIn=false;showSrc();updSel();apply();}});
+})();
+</script>
+</body>
+</html>
