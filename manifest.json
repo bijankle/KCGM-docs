@@ -1,0 +1,16 @@
+{
+  "id": "./?app=kcgm-docs",
+  "name": "KCGM Docs",
+  "short_name": "KCGM Docs",
+  "description": "Search the KCGM project document register and download files in a batch from SharePoint.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#3e4a5f",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
