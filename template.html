@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project Library Downloader</title>
 <style>
-:root{--bg:#f6f5f1;--panel:#fff;--ink:#22221f;--mute:#6b6a64;--line:#dddbd2;--soft:#efede6;--acc:#0f6e56;--acc-soft:#e1f5ee;--acc-ink:#085041;--warn:#854f0b;--warn-soft:#faeeda;--bad:#a32d2d;--row-sel:#e9f6f0}
-@media (prefers-color-scheme:dark){:root{--bg:#1b1b19;--panel:#24241f;--ink:#ecebe6;--mute:#a19f97;--line:#3a3934;--soft:#2e2d29;--acc:#5dcaa5;--acc-soft:#0f3b30;--acc-ink:#bfeedd;--warn:#efb35a;--warn-soft:#3a2c14;--bad:#f09595;--row-sel:#1d3a31}}
+:root{--bg:#f4f5f7;--panel:#fff;--ink:#1f2633;--mute:#64748b;--line:#d9dde4;--soft:#eef0f4;--acc:#3e4a5f;--acc-soft:#e6eaf1;--acc-ink:#2b3442;--warn:#854f0b;--warn-soft:#faeeda;--bad:#a32d2d;--row-sel:#e9edf4}
+@media (prefers-color-scheme:dark){:root{--bg:#171a20;--panel:#1f232b;--ink:#e6e9ee;--mute:#9aa3b2;--line:#343a46;--soft:#282d37;--acc:#9fb0cc;--acc-soft:#2a3343;--acc-ink:#d4dcea;--warn:#efb35a;--warn-soft:#3a2c14;--bad:#f09595;--row-sel:#263041}}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{font:14px/1.4 "Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
@@ -14,7 +14,7 @@ button,input,select{font:inherit;color:inherit}
 button{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 11px;cursor:pointer}
 button:hover{border-color:var(--mute)}
 button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
-@media (prefers-color-scheme:dark){button.pri{color:#04342c}}
+@media (prefers-color-scheme:dark){button.pri{color:#1a2130}}
 button:disabled{opacity:.45;cursor:default}
 header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
 header h1{font-size:17px;margin:0;font-weight:600}
@@ -29,7 +29,7 @@ aside h3 a{text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer;c
 .pill i{font-style:normal;color:var(--mute);margin-left:4px;font-size:11px}
 .pill.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .pill.on i{color:inherit;opacity:.8}
-@media (prefers-color-scheme:dark){.pill.on{color:#04342c}}
+@media (prefers-color-scheme:dark){.pill.on{color:#1a2130}}
 .pill.zero{opacity:.4}
 .more{font-size:12px;color:var(--acc);cursor:pointer;margin-top:4px;display:inline-block}
 .tog{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0;cursor:pointer}
