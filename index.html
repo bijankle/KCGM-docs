@@ -102,7 +102,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <input type="search" id="q" placeholder="Search every column, e.g. CV-402 tail, drift switch, F12 DRG">
       <span class="count" id="count"></span>
       <button id="tickAll">Tick all shown</button>
-      <button id="untickAll">Untick all shown</button>
+      <button id="untickAll">Untick all</button>
       <button id="clearF">Clear filters</button>
     </div>
     <div class="chips" id="chips"></div>
@@ -299,7 +299,7 @@ function tickShown(on){
   linked.forEach(r=>on?ticks.add(r.key):ticks.delete(r.key));saveTicks();updSel();apply();
 }
 $("tickAll").onclick=()=>tickShown(true);
-$("untickAll").onclick=()=>tickShown(false);
+$("untickAll").onclick=()=>{if(!ticks.size)return;const vis=new Set(shown.map(r=>r.key));const hid=[...ticks].filter(k=>!vis.has(k)).length;if(hid&&!confirm("Untick all "+ticks.size.toLocaleString()+" ticked, including "+hid.toLocaleString()+" not shown by the current filters?"))return;ticks.clear();saveTicks();updSel();apply();};
 $("thead").addEventListener("click",e=>{const d=e.target.closest("div[data-k]");if(!d)return;if(sortK===d.dataset.k)sortD=-sortD;else{sortK=d.dataset.k;sortD=1;}sortRows();renderTable();});
 function tickedRows(){return ROWS.filter(r=>ticks.has(r.key)&&r.u);}
 function updSel(){const n=tickedRows().length;$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
