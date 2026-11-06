@@ -438,18 +438,41 @@ $("upFile").onchange=async e=>{
     let rows=null,hi=-1,H=null;
     for(const n of wb.SheetNames){
       const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:""});
-      for(let i=0;i<Math.min(a.length,20);i++){const h=a[i].map(x=>String(x).trim().toLowerCase());if(h.includes("url")&&h.some(x=>x.startsWith("doc"))){rows=a;hi=i;H=h;break;}}
+      for(let i=0;i<Math.min(a.length,20);i++){const h=a[i].map(x=>String(x).trim().toLowerCase());if(h.includes("url")&&(h.some(x=>x.startsWith("doc"))||h.includes("file.name")||h.includes("name"))){rows=a;hi=i;H=h;break;}}
       if(rows)break;
     }
-    if(!rows)return msg("Could not find a header row with URL and Doc Number columns.");
+    if(!rows)return msg("Could not find a header row with a URL column and a Doc Number or File.Name column.");
     const col=(...names)=>H.findIndex(x=>names.some(n=>x===n||x.startsWith(n)));
     const cu=col("url"),cn=col("doc number","doc no","document number","doc"),cr=col("rev"),cs=col("status"),ct=col("title");
-    const cf=H.findIndex((x,i)=>![cu,cn,cr,cs,ct].includes(i));
-    const out=[];
-    for(let i=hi+1;i<rows.length;i++){const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";if(!g(cu)&&!g(cn))continue;out.push([g(cf),g(cu),g(cn),g(cr),g(cs),g(ct)]);}
+    const out=[];let note="";
+    if(cn<0){
+      /* SharePoint export: Title, File.Name, URL (and optionally Site). Doc number, rev and status come from the
+         built in register when the file name is on it, otherwise from the file name itself. Files with no title
+         from either source are left out as not official. */
+      const cname=H.indexOf("file.name")>=0?H.indexOf("file.name"):H.indexOf("name");
+      const byName=new Map(),titleByNum=new Map();
+      for(const x of BUILT.rows){if(x[0])byName.set(x[0].toLowerCase(),x);if(x[6]&&x[3])titleByNum.set(x[3].toUpperCase(),x[6]);}
+      let fromReg=0,fromName=0,regTitle=0,dropped=0,seen=new Set();
+      for(let i=hi+1;i<rows.length;i++){
+        const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";
+        const name=g(cname),url=g(cu);if(!name||!url||seen.has(url))continue;seen.add(url);
+        let t=g(ct);if(t.toLowerCase()==="null")t="";
+        let num,rev,st;const reg=byName.get(name.toLowerCase());
+        let rt=false;if(reg){num=reg[3];rev=reg[4];st=reg[5];if(!t&&reg[6]){t=reg[6];rt=true;}}
+        else{const p=name.replace(/\.[^.]+$/,"").split("_");num=p[0];rev=p[1]||"";st=p[2]&&/^[A-Za-z]{3}$/.test(p[2])?p[2].toUpperCase():"";
+          if(!t){const x=titleByNum.get(num.toUpperCase());if(x){t=x;rt=true;}}}
+        if(!t){dropped++;continue;}
+        reg?fromReg++:fromName++;if(rt)regTitle++;
+        out.push([name,url,num,rev,st,t]);
+      }
+      note=" "+fromReg.toLocaleString()+" matched the register by file name, "+fromName.toLocaleString()+" read from the file name, "+regTitle.toLocaleString()+" titles taken from the register, "+dropped.toLocaleString()+" left out with no title.";
+    }else{
+      const cf=H.findIndex((x,i)=>![cu,cn,cr,cs,ct].includes(i));
+      for(let i=hi+1;i<rows.length;i++){const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";if(!g(cu)&&!g(cn))continue;out.push([g(cf),g(cu),g(cn),g(cr),g(cs),g(ct)]);}
+    }
     const pack={source:f.name+" (uploaded "+new Date().toLocaleDateString()+")",flat:out};
     await idbPut(pack);useFlat(pack);builtIn=false;showSrc();apply();
-    msg("Loaded "+out.length.toLocaleString()+" rows from "+f.name+". Ticks carry across by document number.");
+    msg("Loaded "+out.length.toLocaleString()+" rows from "+f.name+"."+note+" Ticks carry across by document number.");
   }catch(err){msg("Could not read that file: "+err.message);}
 };
 function useFlat(p){ROWS=p.flat.map(x=>mk(x[0],x[1],x[2],x[3],x[4],x[5]));source=p.source;IDX=null;}
