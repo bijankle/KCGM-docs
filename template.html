@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project Library Downloader</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3e4a5f">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%233e4a5f%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2010.5V23a1.5%201.5%200%200%200%201.5%201.5h17A1.5%201.5%200%200%200%2026%2023v-10a1.5%201.5%200%200%200-1.5-1.5H16l-2.5-3H7.5A1.5%201.5%200%200%200%206%2010z%22%2F%3E%3Cpath%20d%3D%22M16%2014.5v6.5M13%2018l3%203%203-3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAKLklEQVR4nOzdC1AV1x3H8T8iL+WN4htEIQqI4ttiog3G1FKtpdoajRq1Jhpt1ABB5OWDWhEUi3GsVhLbEqupOumMUycxxtamvhVFFEUeAqIYlccFeTvao9jERA7slT2Xe8/+PpPJOOPevXrv191l95zd9mOC3iKAprQjAA7EAVyIA7gQB3AhDuBCHMCFOIALcQAX4gAuxAFciAO4EAdwIQ7gQhzAhTiAC3EAF+IALsQBXIgDuBAHcCEO4EIcwIU4gAtxABfiAC7EAVyIA7gQB3AhDuBCHMCFOIALcQAX4gAuxAFciAO4EAdwIQ7gQhzAhTiAC3EAV3syIBsb6yGDvIcO8unn1dvZycHRwb6DjTWJV1qmy8svys4rSN1zoKq6hkAZM8PcwdjSwmLmtInTpwRZWlpQ2yksKg6L3vDN3RICBczdvfxJsCGDfP4QHxEwwt/c3JzalIO93euBAcdPp+sqKglaIvyYY+JPxm6IC+vs4kTGgfWxIS6U/Z+gJWLjmDNj8gdL5pqbG9dhr2tnl3WxSwlaIvBr++lrL899M5iMkq+356qIRQTNEnXM4e/Xf23MEjJiHu49Gh48yLh8jYBDyJaDHXhGhb1DRu/t2VMCRgo/HjddQuL4xc8CXTs5k9EzMzNbtXyRp4cbQVOExDEteAKZCCsry4Q1IeyMHMFz1I+D7cu7uLqQ6XBxdkxYE9q2Z+eMk/pxjAkYRqbGq49bTNgCgu9TPw6ffn3IBI0ZPWz+rCkEz1D/wpuL4pOhl6/knDl/megRCWBr23Hqz8fr9ZJZb0y6Xlj01dFTBE+oH4drJ0VxXMi4ujQinkSqqamdNW2SXi+JeH9+0a07WdnXCUTsVhRetki/lEWCpfx1/3+OndXrJezqceKaENM6oBanza56PHokZG/yA3EbtmfnFer1EhZ3wuoQG2sr0jyDDvYxvPr6huUrk1I2r9brTEZvtx6f799ORqC6prZcV1FapruanZ92ITMtPbOmto4MRfI4mJLS8g9iNm7dGM3Od5Gp6WBjzf7r3tV1gLcXO76uq6vftfefu/cdrG9oIPE0MYY053phXOI2Mn2s73kzg1P/tG7wwP4knlYGGH99Io0dn5IUurp22vi78NcDA0gwDY0+T/30wOGjJ0kK5ubtokLfmTNjMomkrakJ8UkpV6/lkSzmvhk8/tUfkTDaiqPhwYPwlUm379wjWUSHLfDz8SIxNDepSVdxPzw2if2ISLKIDV/Yrp0ZCaDFGW8FN27F/n7Lw4cPSQqunV0mTXiVBNDodMgzaZf++PGnJItfThpHAmh3ruzfP/vi0JHjJAV2SrdXj66kNk1PpF63aUfqngOGucoj2o9fGU5q03QcDx8+Skndz35+KSwqJhPn068vqU3+aystOn0uY9aCFS7OjiOH+hnZxXqz4YN9fb09lSwqYsIp4niKXZ87+OXXZGR27vosOT7C36/lKymdBcwFwc1bjJ3CUVGODupPDceW4ztuPbvRk3t4kDFpw+NlxEE9urm+v2i2n+9L1k8GfNTW1bN/rJu3fVJ06xvSNq3vVoInjvtbSsLwIQOs/z8UiP2CHZnu2rF+clAgaZum42BNLHt3Fu93QxbPHjzQmzRMu3F0sLGObulWAGwBw9zSzjhpN45xY0c5Otg3v0wnF6fAMSNJq7R7QNrXo5eSxTx69ySt0m4cjT+4tshd2WJS0m4cCm9jZ2Gh3Y8IZ0iBC3EAF+IALsQBXIgDuBAHcCEO4EIcwIU4gAtxABfiAC45Lxx49XHz6utuY2N9LSc/O7egtq6e1GZjbeXZx62fZ++q6tqcvAJ9b0tnEmSLY6i/T2z4wmcHatQ3NOz4y769/zik1khdMzOz6VOD5s0Mtmj/3adXUqaLT0o5nZZBEpFqt7Jo/htJa8N/MITH0sJi8fzpyfERdrYdqdXYSj5MiFww51fPlsG4ODkkxoUumPtrkog8cQSM8G/mUR6DBvRjX6qtbQdqBQd7W7aSZm6WMmNq0MujhpAsJInD2ckhMuTt5pfxcO+xJSGKfcH0QtgLtyRGsZU0v9jyZfNU2UQZA0niCHxlhJ1dy1/J4z4SX6SPxjKUDB6zt7MdO9r0HirSJEnicO2sdAI0+4Ib+1B4eMoWU15Go65dOpEUJPlpxby9Hs+6Zl8zO3RQuLCLswNb2E2fkaRWlqZ3q+QmSRJHXv4NvZZ379Vd4ZJu+g8wztXzD2O0JIkjJ9eIzkGx024kBUmOObJy8g3wABclzl3IzL0uyZZDnvMcq9ZtraysojZVrqtcvX4ryUKeOErLdaHRiVXVNdRG2FuHx27UVdwnWUh1+pztXJZGxLfJ3YnZm7K3Zn8Akohsl+zZwWBIVIKB+2Bvx95UmuPQb0k4nuNKVl5IpOH6eFxGZAJ7U5KOnIN9rlwzUB9Py5DoMR3PknYkWGMftSIfl8dWLnEZJPcwQfa1hcVsENQHWy1bucRlkPRjSDMys9lXWKf2MEG2QrZatnKSmvwDjNlXyM5/qLj9YKtiK5S+DNLI6POn2496FZ7F2rg30UIZpJ2pCezrXL4yqZV9sJdrpwzS1LyV8xevtKaPuidPPtdOGaS1SU2sjxWrN9ELiVi1ib2ctERzM97YJfVlK9Y3NDxQ/hK2zWAvSUvPJI3R4nRItgGIXJOssA+2GNubaG2b0Uijc2VPp2Uo6YMtwBbTZhmk5YnUrI/otR82v0xUXLJkMxz1oulZ9ifPpP/mvdiim7ef/63CouJ5v405dU67ZRAexpOTVzh3ccy0KRMGeHv19/K4X1WdnpF14+bt3fsPkubhSU2Pp+Gn7jlA8BzcvAW4EAdwIQ7garNjDisrSSaUitaGH5T6W47SMp2SxUaPHNy9qytBs9hHxD4oJUsq/Nj1ov6Wo1xX6ezk0OJibj277f4ogUAlphFHWXkFgcGJiEP93UpmVi6BwYn42NWP48jRUwQGd+jIcVKb+nHkFRQZyd0QtOPM+Us3i++Q2oSc59j60R4CA9rx530kgJA4rl67zi54EhjEsZPnBc3uF3WGNGHzzjt3SwgEK759d33yxySGqDhKSsuXRMTfKykjEIZ9yO8tX6erqCQxBF5bYVG/Gxp3o6mhNNB67INdGLLm7r1SEsbc3cufhKmqrvniq2N+vi91cVV6E1lQIu3ilZDIBHYymkQSGwc9GaP7+eH/Ftwodu/V3cnRnqB18vKLkrd9sn3n3voGFWZ3Ns9sTNBbZCijhg0cHxjw2thRBPr78l8nDv/7xMmzF8lQDBpHIxtrK19vT3ZxztHBrmMHGwI+tl9m+w524Jl5NbdG5I1omtQG4znYX/Ls+csERg8jwYALcQAX4gAuxAFciAO4EAdwIQ7gQhzAhTiAC3EAF+IALsQBXIgDuBAHcCEO4EIcwIU4gAtxABfiAC7EAVyIA7gQB3AhDuBCHMCFOIALcQAX4gAuxAFciAO4EAdwIQ7gQhzAhTiAC3EA1/8AAAD//9qxIuoAAAAGSURBVAMA0BY1xcGi+bwAAAAASUVORK5CYII=">
 <style>
@@ -100,7 +102,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <input type="search" id="q" placeholder="Search every column, e.g. CV-402 tail, drift switch, F12 DRG">
       <span class="count" id="count"></span>
       <button id="tickAll">Tick all shown</button>
-      <button id="untickAll">Untick all shown</button>
+      <button id="untickAll">Untick all</button>
       <button id="clearF">Clear filters</button>
     </div>
     <div class="chips" id="chips"></div>
@@ -297,7 +299,7 @@ function tickShown(on){
   linked.forEach(r=>on?ticks.add(r.key):ticks.delete(r.key));saveTicks();updSel();apply();
 }
 $("tickAll").onclick=()=>tickShown(true);
-$("untickAll").onclick=()=>tickShown(false);
+$("untickAll").onclick=()=>{if(!ticks.size)return;const vis=new Set(shown.map(r=>r.key));const hid=[...ticks].filter(k=>!vis.has(k)).length;if(hid&&!confirm("Untick all "+ticks.size.toLocaleString()+" ticked, including "+hid.toLocaleString()+" not shown by the current filters?"))return;ticks.clear();saveTicks();updSel();apply();};
 $("thead").addEventListener("click",e=>{const d=e.target.closest("div[data-k]");if(!d)return;if(sortK===d.dataset.k)sortD=-sortD;else{sortK=d.dataset.k;sortD=1;}sortRows();renderTable();});
 function tickedRows(){return ROWS.filter(r=>ticks.has(r.key)&&r.u);}
 function updSel(){const n=tickedRows().length;$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
@@ -436,18 +438,41 @@ $("upFile").onchange=async e=>{
     let rows=null,hi=-1,H=null;
     for(const n of wb.SheetNames){
       const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:""});
-      for(let i=0;i<Math.min(a.length,20);i++){const h=a[i].map(x=>String(x).trim().toLowerCase());if(h.includes("url")&&h.some(x=>x.startsWith("doc"))){rows=a;hi=i;H=h;break;}}
+      for(let i=0;i<Math.min(a.length,20);i++){const h=a[i].map(x=>String(x).trim().toLowerCase());if(h.includes("url")&&(h.some(x=>x.startsWith("doc"))||h.includes("file.name")||h.includes("name"))){rows=a;hi=i;H=h;break;}}
       if(rows)break;
     }
-    if(!rows)return msg("Could not find a header row with URL and Doc Number columns.");
+    if(!rows)return msg("Could not find a header row with a URL column and a Doc Number or File.Name column.");
     const col=(...names)=>H.findIndex(x=>names.some(n=>x===n||x.startsWith(n)));
     const cu=col("url"),cn=col("doc number","doc no","document number","doc"),cr=col("rev"),cs=col("status"),ct=col("title");
-    const cf=H.findIndex((x,i)=>![cu,cn,cr,cs,ct].includes(i));
-    const out=[];
-    for(let i=hi+1;i<rows.length;i++){const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";if(!g(cu)&&!g(cn))continue;out.push([g(cf),g(cu),g(cn),g(cr),g(cs),g(ct)]);}
+    const out=[];let note="";
+    if(cn<0){
+      /* SharePoint export: Title, File.Name, URL (and optionally Site). Doc number, rev and status come from the
+         built in register when the file name is on it, otherwise from the file name itself. Files with no title
+         from either source are left out as not official. */
+      const cname=H.indexOf("file.name")>=0?H.indexOf("file.name"):H.indexOf("name");
+      const byName=new Map(),titleByNum=new Map();
+      for(const x of BUILT.rows){if(x[0])byName.set(x[0].toLowerCase(),x);if(x[6]&&x[3])titleByNum.set(x[3].toUpperCase(),x[6]);}
+      let fromReg=0,fromName=0,regTitle=0,dropped=0,seen=new Set();
+      for(let i=hi+1;i<rows.length;i++){
+        const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";
+        const name=g(cname),url=g(cu);if(!name||!url||seen.has(url))continue;seen.add(url);
+        let t=g(ct);if(t.toLowerCase()==="null")t="";
+        let num,rev,st;const reg=byName.get(name.toLowerCase());
+        let rt=false;if(reg){num=reg[3];rev=reg[4];st=reg[5];if(!t&&reg[6]){t=reg[6];rt=true;}}
+        else{const p=name.replace(/\.[^.]+$/,"").split("_");num=p[0];rev=p[1]||"";st=p[2]&&/^[A-Za-z]{3}$/.test(p[2])?p[2].toUpperCase():"";
+          if(!t){const x=titleByNum.get(num.toUpperCase());if(x){t=x;rt=true;}}}
+        if(!t){dropped++;continue;}
+        reg?fromReg++:fromName++;if(rt)regTitle++;
+        out.push([name,url,num,rev,st,t]);
+      }
+      note=" "+fromReg.toLocaleString()+" matched the register by file name, "+fromName.toLocaleString()+" read from the file name, "+regTitle.toLocaleString()+" titles taken from the register, "+dropped.toLocaleString()+" left out with no title.";
+    }else{
+      const cf=H.findIndex((x,i)=>![cu,cn,cr,cs,ct].includes(i));
+      for(let i=hi+1;i<rows.length;i++){const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";if(!g(cu)&&!g(cn))continue;out.push([g(cf),g(cu),g(cn),g(cr),g(cs),g(ct)]);}
+    }
     const pack={source:f.name+" (uploaded "+new Date().toLocaleDateString()+")",flat:out};
     await idbPut(pack);useFlat(pack);builtIn=false;showSrc();apply();
-    msg("Loaded "+out.length.toLocaleString()+" rows from "+f.name+". Ticks carry across by document number.");
+    msg("Loaded "+out.length.toLocaleString()+" rows from "+f.name+"."+note+" Ticks carry across by document number.");
   }catch(err){msg("Could not read that file: "+err.message);}
 };
 function useFlat(p){ROWS=p.flat.map(x=>mk(x[0],x[1],x[2],x[3],x[4],x[5]));source=p.source;IDX=null;}
@@ -461,5 +486,6 @@ showSrc();updSel();apply();
 idbGet().then(p=>{if(p&&p.flat){useFlat(p);builtIn=false;showSrc();updSel();apply();}});
 })();
 </script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
 </body>
 </html>
