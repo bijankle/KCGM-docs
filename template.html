@@ -42,6 +42,7 @@ main{flex:1;display:flex;flex-direction:column;min-width:0}
 .bar{display:flex;gap:8px;align-items:center;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--panel)}
 .bar input[type=search]{flex:1;min-width:220px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
 .count{color:var(--mute);font-size:13px;white-space:nowrap}
+button.ico{display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;line-height:0}
 .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px}
 .chips:not(:empty){padding:8px 14px;border-bottom:1px solid var(--line)}
 .chip{font-size:12px;background:var(--acc-soft);color:var(--acc-ink);border-radius:999px;padding:2px 4px 2px 9px}
@@ -83,11 +84,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <h1><svg class="logo" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#475569"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10.5V23a1.5 1.5 0 0 0 1.5 1.5h17A1.5 1.5 0 0 0 26 23v-10a1.5 1.5 0 0 0-1.5-1.5H16l-2.5-3H7.5A1.5 1.5 0 0 0 6 10z"/><path d="M16 14.5v6.5M13 18l3 3 3-3"/></g></svg>Project Library Downloader</h1>
   <span class="src" id="src"></span>
   <span class="sp"></span>
-  <button id="helpBtn">How it works</button>
   <button class="pri" id="pasteBtn">Paste a list</button>
-  <button id="upBtn">Update register</button>
-  <button id="resetBtn" style="display:none">Use built in register</button>
-  <input type="file" id="upFile" accept=".xlsx,.xlsm,.xls,.csv" hidden>
 </header>
 <div id="msg"></div>
 <div class="wrap">
@@ -101,9 +98,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <div class="bar">
       <input type="search" id="q" placeholder="Search every column, e.g. CV-402 tail, drift switch, F12 DRG">
       <span class="count" id="count"></span>
-      <button id="tickAll">Tick all shown</button>
-      <button id="untickAll">Untick all</button>
-      <button id="clearF">Clear filters</button>
+      <button class="ico" id="copyView" title="Copy this view as a table: Doc Number, Rev, Title, SharePoint Link"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+      <span class="count" id="copyViewNote"></span>
     </div>
     <div class="chips" id="chips"></div>
     <div class="thead" id="thead">
@@ -115,6 +111,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </div>
 <footer>
   <strong id="selCount">0 ticked</strong>
+  <button class="ico" id="copyTicks" title="Copy ticked files as a table: Doc Number, Rev, Title, SharePoint Link"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+  <span class="count" id="copyTicksNote"></span>
   <button id="clearSel">Clear ticks</button>
   <button id="copyBtn">Copy links</button>
   <button id="csvBtn">Export list</button>
@@ -138,22 +136,6 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <button id="pasteTick" disabled>Tick matched</button>
     <button class="pri" id="pasteDl" disabled>Tick and download</button>
   </div>
-</dialog>
-<dialog id="help">
-  <h3 style="margin-top:0">How it works</h3>
-  <div class="help">
-  <ol>
-    <li>Open this file in the browser you use for SharePoint, and make sure you are signed in to SharePoint in another tab.</li>
-    <li>Search and use the pills to narrow the list. Pills in the same group widen the match, pills in different groups narrow it.</li>
-    <li>Tick the items you want. Ticks are remembered in this browser.</li>
-    <li>Click <b>Test one file</b> first. If the browser asks to allow pop ups or multiple downloads from this page, choose Allow.</li>
-    <li>Or click <b>Paste a list</b>, paste doc numbers or file names one per line, then Tick and download. The latest revision of each is used.</li>
-    <li>Click <b>Download all ticked</b>. Each file is opened one after the other with a short gap. Leave the page open until the bar is full.</li>
-  </ol>
-  <p>If nothing arrives with the Background method, switch to New tab per file. Force download asks SharePoint to save the file rather than preview it. If files open in a preview instead of saving, untick it to see whether the links work at all.</p>
-  <p>Update register loads a newer copy of the register (.xlsm, .xlsx or .csv with URL, Doc Number, Rev, Status and Title columns). It is kept in this browser until you choose Use built in register.</p>
-  </div>
-  <form method="dialog" style="text-align:right"><button class="pri">OK</button></form>
 </dialog>
 <script type="application/json" id="data">__DATA__</script>
 <script>
@@ -228,6 +210,7 @@ function apply(){
   const all={};GROUPS.forEach(([k])=>all[k]=new Map());
   for(const r of ROWS){for(const [k] of GROUPS){const v=r[k]||"(none)";all[k].set(v,(all[k].get(v)||0)+1);}}
   sortRows();renderGroups(counts,all);renderChips();renderTable();
+  $("copyViewNote").textContent="";
   $("count").textContent=shown.length.toLocaleString()+" of "+ROWS.length.toLocaleString()+" shown";
 }
 function revKey(v){v=String(v||"").trim().toUpperCase();const m=v.match(/^(\d+(?:\.\d+)?)(.*)$/);if(m)return[2,parseFloat(m[1]),m[2]];if(/^[A-Z]/.test(v))return[1,0,v];return[0,0,v];}
@@ -298,13 +281,23 @@ function tickShown(on){
   if(on&&linked.length>500&&!confirm("Tick all "+linked.length.toLocaleString()+" items shown?")){updHdr();return;}
   linked.forEach(r=>on?ticks.add(r.key):ticks.delete(r.key));saveTicks();updSel();apply();
 }
-$("tickAll").onclick=()=>tickShown(true);
-$("untickAll").onclick=()=>{if(!ticks.size)return;const vis=new Set(shown.map(r=>r.key));const hid=[...ticks].filter(k=>!vis.has(k)).length;if(hid&&!confirm("Untick all "+ticks.size.toLocaleString()+" ticked, including "+hid.toLocaleString()+" not shown by the current filters?"))return;ticks.clear();saveTicks();updSel();apply();};
 $("thead").addEventListener("click",e=>{const d=e.target.closest("div[data-k]");if(!d)return;if(sortK===d.dataset.k)sortD=-sortD;else{sortK=d.dataset.k;sortD=1;}sortRows();renderTable();});
 function tickedRows(){return ROWS.filter(r=>ticks.has(r.key)&&r.u);}
-function updSel(){const n=tickedRows().length;$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
+function updSel(){const n=tickedRows().length;$("copyTicksNote").textContent="";$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
 $("clearSel").onclick=()=>{if(ticks.size&&confirm("Clear all "+ticks.size+" ticks?")){ticks.clear();saveTicks();updSel();apply();}};
-$("clearF").onclick=()=>{GROUPS.forEach(([k])=>fsel[k].clear());$("q").value="";apply();};
+function copyTable(rs,noteId){
+  const note=$(noteId);
+  if(!rs.length){note.textContent="Nothing to copy";return;}
+  if(rs.length>5000&&!confirm("Copy "+rs.length.toLocaleString()+" rows? That is a lot to paste into an email."))return;
+  const H=["Doc Number","Rev","Title","SharePoint Link"];
+  const tsv=[H.join("\t")].concat(rs.map(r=>[r.num,r.rev,r.t,linkOf(r,false)].map(v=>String(v||"").replace(/[\t\r\n]+/g," ")).join("\t"))).join("\r\n");
+  const html='<table border="1" cellspacing="0" cellpadding="3"><tr>'+H.map(h=>"<th>"+esc(h)+"</th>").join("")+"</tr>"+rs.map(r=>{const u=linkOf(r,false);return"<tr><td>"+esc(r.num)+"</td><td>"+esc(r.rev)+"</td><td>"+esc(r.t)+"</td><td>"+(u?'<a href="'+esc(u)+'">'+esc(u)+"</a>":"")+"</td></tr>";}).join("")+"</table>";
+  const on=e=>{e.clipboardData.setData("text/html",html);e.clipboardData.setData("text/plain",tsv);e.preventDefault();};
+  document.addEventListener("copy",on);let ok=false;try{ok=document.execCommand("copy");}catch(e){}document.removeEventListener("copy",on);
+  note.textContent=ok?"Copied "+rs.length.toLocaleString()+" rows":"Could not copy";
+}
+$("copyView").onclick=()=>copyTable(shown,"copyViewNote");
+$("copyTicks").onclick=()=>copyTable(tickedRows(),"copyTicksNote");
 let qT=0;$("q").addEventListener("input",()=>{clearTimeout(qT);qT=setTimeout(apply,160)});
 ["hideSup","onlyLink","onlySel"].forEach(id=>$(id).addEventListener("change",apply));
 
@@ -418,7 +411,6 @@ $("pasteDl").onclick=()=>{
 };
 
 /* help */
-$("helpBtn").onclick=()=>$("help").showModal();
 
 /* upload update, stored in IndexedDB */
 const DBN="pld_db",ST="reg";
@@ -426,64 +418,13 @@ function idb(){return new Promise((res,rej)=>{const o=indexedDB.open(DBN,1);o.on
 async function idbGet(){try{const d=await idb();return await new Promise(r=>{const q=d.transaction(ST).objectStore(ST).get("cur");q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);});}catch(e){return null}}
 async function idbPut(v){try{const d=await idb();await new Promise(r=>{const t=d.transaction(ST,"readwrite");v==null?t.objectStore(ST).delete("cur"):t.objectStore(ST).put(v,"cur");t.oncomplete=r;t.onerror=r;});}catch(e){}}
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
-$("upBtn").onclick=()=>$("upFile").click();
-$("upFile").onchange=async e=>{
-  const f=e.target.files[0];e.target.value="";if(!f)return;
-  msg("Reading "+f.name+" ...");
-  try{
-    if(!window.XLSX)await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
-  }catch(err){return msg("Could not load the spreadsheet reader from the internet. Save the register as .csv and upload that instead, or check your connection.");}
-  try{
-    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
-    let rows=null,hi=-1,H=null;
-    for(const n of wb.SheetNames){
-      const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:""});
-      for(let i=0;i<Math.min(a.length,20);i++){const h=a[i].map(x=>String(x).trim().toLowerCase());if(h.includes("url")&&(h.some(x=>x.startsWith("doc"))||h.includes("file.name")||h.includes("name"))){rows=a;hi=i;H=h;break;}}
-      if(rows)break;
-    }
-    if(!rows)return msg("Could not find a header row with a URL column and a Doc Number or File.Name column.");
-    const col=(...names)=>H.findIndex(x=>names.some(n=>x===n||x.startsWith(n)));
-    const cu=col("url"),cn=col("doc number","doc no","document number","doc"),cr=col("rev"),cs=col("status"),ct=col("title");
-    const out=[];let note="";
-    if(cn<0){
-      /* SharePoint export: Title, File.Name, URL (and optionally Site). Doc number, rev and status come from the
-         built in register when the file name is on it, otherwise from the file name itself. Files with no title
-         from either source are left out as not official. */
-      const cname=H.indexOf("file.name")>=0?H.indexOf("file.name"):H.indexOf("name");
-      const byName=new Map(),titleByNum=new Map();
-      for(const x of BUILT.rows){if(x[0])byName.set(x[0].toLowerCase(),x);if(x[6]&&x[3])titleByNum.set(x[3].toUpperCase(),x[6]);}
-      let fromReg=0,fromName=0,regTitle=0,dropped=0,seen=new Set();
-      for(let i=hi+1;i<rows.length;i++){
-        const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";
-        const name=g(cname),url=g(cu);if(!name||!url||seen.has(url))continue;seen.add(url);
-        let t=g(ct);if(t.toLowerCase()==="null")t="";
-        let num,rev,st;const reg=byName.get(name.toLowerCase());
-        let rt=false;if(reg){num=reg[3];rev=reg[4];st=reg[5];if(!t&&reg[6]){t=reg[6];rt=true;}}
-        else{const p=name.replace(/\.[^.]+$/,"").split("_");num=p[0];rev=p[1]||"";st=p[2]&&/^[A-Za-z]{3}$/.test(p[2])?p[2].toUpperCase():"";
-          if(!t){const x=titleByNum.get(num.toUpperCase());if(x){t=x;rt=true;}}}
-        if(!t){dropped++;continue;}
-        reg?fromReg++:fromName++;if(rt)regTitle++;
-        out.push([name,url,num,rev,st,t]);
-      }
-      note=" "+fromReg.toLocaleString()+" matched the register by file name, "+fromName.toLocaleString()+" read from the file name, "+regTitle.toLocaleString()+" titles taken from the register, "+dropped.toLocaleString()+" left out with no title.";
-    }else{
-      const cf=H.findIndex((x,i)=>![cu,cn,cr,cs,ct].includes(i));
-      for(let i=hi+1;i<rows.length;i++){const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";if(!g(cu)&&!g(cn))continue;out.push([g(cf),g(cu),g(cn),g(cr),g(cs),g(ct)]);}
-    }
-    const pack={source:f.name+" (uploaded "+new Date().toLocaleDateString()+")",flat:out};
-    await idbPut(pack);useFlat(pack);builtIn=false;showSrc();apply();
-    msg("Loaded "+out.length.toLocaleString()+" rows from "+f.name+"."+note+" Ticks carry across by document number.");
-  }catch(err){msg("Could not read that file: "+err.message);}
-};
-function useFlat(p){ROWS=p.flat.map(x=>mk(x[0],x[1],x[2],x[3],x[4],x[5]));source=p.source;IDX=null;}
-$("resetBtn").onclick=async()=>{await idbPut(null);loadPacked(BUILT);IDX=null;builtIn=true;showSrc();apply();msg("Back on the built in register.");};
-function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.toLocaleString()+" items";$("resetBtn").style.display=builtIn?"none":"";}
+function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.toLocaleString()+" items"}
 
 /* start */
 const BUILT=JSON.parse($("data").textContent);
 loadPacked(BUILT);
 showSrc();updSel();apply();
-idbGet().then(p=>{if(p&&p.flat){useFlat(p);builtIn=false;showSrc();updSel();apply();}});
+idbPut(null); /* uploads were removed; drop any copy left from an earlier upload so everyone sees the built in register */
 })();
 </script>
 <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
