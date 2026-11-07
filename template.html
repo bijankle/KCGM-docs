@@ -42,7 +42,10 @@ main{flex:1;display:flex;flex-direction:column;min-width:0}
 .bar{display:flex;gap:8px;align-items:center;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--panel)}
 .bar input[type=search]{flex:1;min-width:220px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
 .count{color:var(--mute);font-size:13px;white-space:nowrap}
-button.ico{display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;line-height:0}
+.seg{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg .lbl{display:inline-flex;align-items:center;gap:5px;padding:0 9px;color:var(--mute);font-size:13px}
+.seg button{border:0;border-left:1px solid var(--line);border-radius:0}
+.seg button:hover{background:var(--soft)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px}
 .chips:not(:empty){padding:8px 14px;border-bottom:1px solid var(--line)}
 .chip{font-size:12px;background:var(--acc-soft);color:var(--acc-ink);border-radius:999px;padding:2px 4px 2px 9px}
@@ -98,8 +101,6 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <div class="bar">
       <input type="search" id="q" placeholder="Search every column, e.g. CV-402 tail, drift switch, F12 DRG">
       <span class="count" id="count"></span>
-      <button class="ico" id="copyView" title="Copy this view as a table: Doc Number, Rev, Title, SharePoint Link"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
-      <span class="count" id="copyViewNote"></span>
     </div>
     <div class="chips" id="chips"></div>
     <div class="thead" id="thead">
@@ -111,8 +112,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </div>
 <footer>
   <strong id="selCount">0 ticked</strong>
-  <button class="ico" id="copyTicks" title="Copy ticked files as a table: Doc Number, Rev, Title, SharePoint Link"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
-  <span class="count" id="copyTicksNote"></span>
+  <span class="seg"><span class="lbl"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M10 9v11"/></svg>Copy table</span><button id="copyView" title="Copy every row the current filters and search show: Doc Number, Rev, Title, SharePoint Link">View</button><button id="copyTicks" title="Copy the ticked files: Doc Number, Rev, Title, SharePoint Link">Ticked</button></span>
+  <span class="count" id="copyNote"></span>
   <button id="clearSel">Clear ticks</button>
   <button id="copyBtn">Copy links</button>
   <button id="csvBtn">Export list</button>
@@ -210,7 +211,7 @@ function apply(){
   const all={};GROUPS.forEach(([k])=>all[k]=new Map());
   for(const r of ROWS){for(const [k] of GROUPS){const v=r[k]||"(none)";all[k].set(v,(all[k].get(v)||0)+1);}}
   sortRows();renderGroups(counts,all);renderChips();renderTable();
-  $("copyViewNote").textContent="";
+  $("copyNote").textContent="";
   $("count").textContent=shown.length.toLocaleString()+" of "+ROWS.length.toLocaleString()+" shown";
 }
 function revKey(v){v=String(v||"").trim().toUpperCase();const m=v.match(/^(\d+(?:\.\d+)?)(.*)$/);if(m)return[2,parseFloat(m[1]),m[2]];if(/^[A-Z]/.test(v))return[1,0,v];return[0,0,v];}
@@ -283,21 +284,21 @@ function tickShown(on){
 }
 $("thead").addEventListener("click",e=>{const d=e.target.closest("div[data-k]");if(!d)return;if(sortK===d.dataset.k)sortD=-sortD;else{sortK=d.dataset.k;sortD=1;}sortRows();renderTable();});
 function tickedRows(){return ROWS.filter(r=>ticks.has(r.key)&&r.u);}
-function updSel(){const n=tickedRows().length;$("copyTicksNote").textContent="";$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
+function updSel(){const n=tickedRows().length;$("copyNote").textContent="";$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
 $("clearSel").onclick=()=>{if(ticks.size&&confirm("Clear all "+ticks.size+" ticks?")){ticks.clear();saveTicks();updSel();apply();}};
-function copyTable(rs,noteId){
+function copyTable(rs,noteId,what){
   const note=$(noteId);
-  if(!rs.length){note.textContent="Nothing to copy";return;}
+  if(!rs.length){note.textContent=what==="ticked"?"Nothing ticked":"Nothing shown";return;}
   if(rs.length>5000&&!confirm("Copy "+rs.length.toLocaleString()+" rows? That is a lot to paste into an email."))return;
   const H=["Doc Number","Rev","Title","SharePoint Link"];
   const tsv=[H.join("\t")].concat(rs.map(r=>[r.num,r.rev,r.t,linkOf(r,false)].map(v=>String(v||"").replace(/[\t\r\n]+/g," ")).join("\t"))).join("\r\n");
   const html='<table border="1" cellspacing="0" cellpadding="3"><tr>'+H.map(h=>"<th>"+esc(h)+"</th>").join("")+"</tr>"+rs.map(r=>{const u=linkOf(r,false);return"<tr><td>"+esc(r.num)+"</td><td>"+esc(r.rev)+"</td><td>"+esc(r.t)+"</td><td>"+(u?'<a href="'+esc(u)+'">'+esc(u)+"</a>":"")+"</td></tr>";}).join("")+"</table>";
   const on=e=>{e.clipboardData.setData("text/html",html);e.clipboardData.setData("text/plain",tsv);e.preventDefault();};
   document.addEventListener("copy",on);let ok=false;try{ok=document.execCommand("copy");}catch(e){}document.removeEventListener("copy",on);
-  note.textContent=ok?"Copied "+rs.length.toLocaleString()+" rows":"Could not copy";
+  note.textContent=ok?"Copied "+rs.length.toLocaleString()+(what==="ticked"?" ticked":" shown")+" rows":"Could not copy";
 }
-$("copyView").onclick=()=>copyTable(shown,"copyViewNote");
-$("copyTicks").onclick=()=>copyTable(tickedRows(),"copyTicksNote");
+$("copyView").onclick=()=>copyTable(shown,"copyNote","view");
+$("copyTicks").onclick=()=>copyTable(tickedRows(),"copyNote","ticked");
 let qT=0;$("q").addEventListener("input",()=>{clearTimeout(qT);qT=setTimeout(apply,160)});
 ["hideSup","onlyLink","onlySel"].forEach(id=>$(id).addEventListener("change",apply));
 
