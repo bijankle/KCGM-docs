@@ -198,7 +198,7 @@ function mk(name,url,num,rev,st,t){
 }
 function loadPacked(d){
   const F=d.folders;
-  ROWS=d.rows.map(x=>{const url=x[1]>=0?F[x[1]]+"/"+(x[2]||x[0]):"";return mk(x[0],url,x[3],x[4],x[5],x[6]);});
+  ROWS=d.rows.map(x=>{const url=x[1]>=0?F[x[1]]+"/"+(x[2]||x[0]):"";const r=mk(x[0],url,x[3],x[4],x[5],x[6]);r.size=x[7]||0;return r;});
   source=d.source||"";
 }
 function linkOf(r,force){
@@ -466,7 +466,9 @@ $("copyMiss").onclick=async()=>{const t=pasteRes.filter(x=>!x.r).map(x=>x.raw).j
 function tickPasted(){const ok=pasteRes.filter(x=>x.r);ok.forEach(x=>ticks.add(x.r.key));saveTicks();updSel();apply();return ok.map(x=>x.r);}
 $("pasteTick").onclick=()=>{const n=tickPasted().length;$("paste").close();msg(n+" items ticked from your list.");};
 $("pasteDl").onclick=()=>{
-  const list=tickPasted();$("paste").close();
+  const big=Number.MAX_SAFE_INTEGER;
+  const list=tickPasted().slice().sort((a,b)=>(a.size>0?a.size:big)-(b.size>0?b.size:big)); /* smallest files first, unknown sizes last */
+  $("paste").close();
   if(run)return msg("A download is already running.");
   if(list.length>50&&!confirm(list.length+" files is a large batch. Continue anyway?"))return;
   run={list,i:0,t:0,paused:false};msg("");setProg(0,list.length);$("stopBtn").style.display="";$("dlBtn").disabled=true;step();
