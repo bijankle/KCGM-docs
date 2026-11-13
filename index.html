@@ -24,6 +24,8 @@ header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var
 header h1{font-size:17px;margin:0;font-weight:600;display:flex;align-items:center;gap:8px}
 header .logo{flex:none}
 header .src{color:var(--mute);font-size:12px}
+header #upd{margin-left:-8px}
+header #upd.fresh{color:var(--acc);font-weight:600}
 header .sp{flex:1}
 .wrap{flex:1;display:flex;min-height:0}
 aside{width:230px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:12px 14px}
@@ -101,6 +103,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 <header>
   <h1><svg class="logo" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#475569"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10.5V23a1.5 1.5 0 0 0 1.5 1.5h17A1.5 1.5 0 0 0 26 23v-10a1.5 1.5 0 0 0-1.5-1.5H16l-2.5-3H7.5A1.5 1.5 0 0 0 6 10z"/><path d="M16 14.5v6.5M13 18l3 3 3-3"/></g></svg>Project Library Downloader</h1>
   <span class="src" id="src"></span>
+  <span class="src" id="upd"></span>
   <span class="sp"></span>
   <button class="pri" id="pasteBtn">Paste a list</button>
 </header>
@@ -511,6 +514,14 @@ function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.to
 
 /* start */
 const BUILT=JSON.parse($("data").textContent);
+/* when this page was last published (GitHub Pages sends it with the page) */
+(()=>{const el=$("upd"),t=new Date(document.lastModified);if(isNaN(t))return;
+  const tick=()=>{const s=Math.max(0,(Date.now()-t)/1000);let a;
+    if(s<60)a="just now";else if(s<3600)a=Math.floor(s/60)+" min ago";else if(s<86400){const h=Math.floor(s/3600);a=h+(h===1?" hour ago":" hours ago");}
+    else if(s<86400*30){const d=Math.floor(s/86400);a=d+(d===1?" day ago":" days ago");}else a="on "+t.toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"});
+    el.textContent="| App updated "+a;el.classList.toggle("fresh",s<86400);
+    el.title="Last published "+t.toLocaleString("en-AU",{weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});};
+  tick();setInterval(tick,60000);})();
 loadPacked(BUILT);buildTree();
 showSrc();updSel();apply();
 idbPut(null); /* uploads were removed; drop any copy left from an earlier upload so everyone sees the built in register */
