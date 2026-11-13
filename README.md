@@ -10,13 +10,17 @@ Open `index.html` in a browser. Nothing needs installing.
 
 `template.html` is the page without data. The register goes in at the `__DATA__` placeholder.
 
-`build_data.py` packs the register xlsm into compact JSON.
+`build_data.py` reads the register workbook and builds `index.html` from `template.html`.
 
 ## Rebuilding with a newer register
 
-Run `build_data.py` on the xlsm to make `data.json`. Then replace `__DATA__` in `template.html` with the contents of `data.json`, escaping `</` as `<\/`, and save the result as `index.html`.
+Run this with the latest `2000 Project Document Register.xlsm`:
 
-You can also load a newer xlsm or csv straight into the page with the Update register button. That copy is kept in your browser only.
+```
+python build_data.py "2000 Project Document Register.xlsm"
+```
+
+It reads each document from the Doc Register sheet and finds its SharePoint folder by file name in the Team Site Export and Overflow sheets, taking the first match, the same rule the register uses. It writes `data.json` and a new `index.html` with the register inside. Only `index.html` needs committing.
 
 ## Ticking
 
