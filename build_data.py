@@ -4,7 +4,7 @@ Usage: python build_data.py "2000 Project Document Register.xlsm"
 
 Reads the "Doc Register" sheet for each document (file name, doc number, rev,
 status, title) and the "Team Site Export" and "Overflow" sheets for where each
-file lives on SharePoint. A document's link is the first file in the export
+file lives on SharePoint and its size in bytes. A document's link is the first file in the export
 with the same name, the same rule the register itself uses. Writes data.json,
 then builds index.html from template.html with the data inside it.
 """
@@ -52,7 +52,11 @@ def main(src):
                 continue
             if name.startswith("http"):
                 name = name.rsplit("/", 1)[1].replace("%20", " ")
-            where.setdefault(name.lower(), path)  # first match wins
+            try:
+                size = int(float(text(r[3]) or 0))
+            except ValueError:
+                size = 0
+            where.setdefault(name.lower(), (path, size))  # first match wins
 
     folders, F, out = {}, [], []
     for i, r in enumerate(sheet_rows(wb, "Doc Register")):
@@ -62,14 +66,14 @@ def main(src):
         if not (name or num):
             continue
         fi = -1
-        path = where.get(name.lower()) if name else None
+        path, size = where.get(name.lower(), (None, 0)) if name else (None, 0)
         if path:
             folder = SITE + path
             if folder not in folders:
                 folders[folder] = len(F)
                 F.append(folder)
             fi = folders[folder]
-        out.append([name, fi, "", num, rev, st, title])
+        out.append([name, fi, "", num, rev, st, title, size])
 
     data = {"folders": F, "rows": out, "source": os.path.basename(src)}
     packed = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
