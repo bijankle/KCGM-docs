@@ -146,7 +146,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <h3 style="margin-top:0">Paste a list of files</h3>
   <p class="help" style="margin:0 0 8px">One per line. Doc numbers or file names both work, with or without revision and extension, e.g. 2000-F12-DRG-ME-10456 or 2000-F12-DRG-ME-10456_0_APP.pdf. The latest revision of each is picked. Numbered revisions rank above lettered ones, so Rev 0 beats Rev C.</p>
   <textarea id="pasteTxt" rows="8" style="width:100%;font:12px Consolas,ui-monospace,monospace;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)"></textarea>
-  <div style="display:flex;gap:8px;margin:8px 0;align-items:center"><button id="matchBtn">Match</button><span class="count" id="matchSum"></span></div>
+  <div style="display:flex;gap:8px;margin:8px 0;align-items:center;flex-wrap:wrap"><button id="matchBtn">Match</button><span class="count" id="matchSum"></span><span style="flex:1"></span><button id="dirBtn" style="display:none;align-items:center;gap:6px" title="Files already in this folder are listed but not downloaded. Only files directly in the folder are checked, not subfolders."><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span id="dirName">Choose downloads folder</span></button></div>
   <div id="matchOut" style="max-height:38vh;overflow:auto;font-size:12px"></div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
     <button id="copyMiss" style="display:none">Copy not found</button>
@@ -445,17 +445,20 @@ function lookup(line){
 let pasteRes=[];
 $("pasteBtn").onclick=()=>{$("paste").showModal();$("pasteTxt").focus();};
 $("pasteClose").onclick=()=>$("paste").close();
-$("matchBtn").onclick=()=>{
+$("matchBtn").onclick=async()=>{
   if(!IDX)buildIdx();
+  const have=await dirNames();
   const seen=new Set();
   pasteRes=$("pasteTxt").value.split(/[\r\n]+/).map(lookup).filter(x=>x&&!seen.has(x.raw.toUpperCase())&&seen.add(x.raw.toUpperCase()));
-  const ok=pasteRes.filter(x=>x.r),miss=pasteRes.filter(x=>!x.r);
-  $("matchSum").textContent=ok.length+" matched, "+miss.length+" not found"+(miss.some(x=>x.nolink)?" or no link":"");
+  for(const x of pasteRes)x.inDir=!!(x.r&&have&&have.has(dirKey(x.r.name)));
+  const ok=pasteRes.filter(x=>x.r&&!x.inDir),miss=pasteRes.filter(x=>!x.r),there=pasteRes.filter(x=>x.inDir);
+  $("matchSum").textContent=ok.length+" to download, "+(there.length?there.length+" already in downloads folder, ":"")+miss.length+" not found"+(miss.some(x=>x.nolink)?" or no link":"");
   let h='<table style="width:100%;border-collapse:collapse">';
   for(const x of pasteRes){
     const r=x.r;
     h+=`<tr style="border-bottom:1px solid var(--soft)"><td style="padding:3px 6px;font-family:Consolas,monospace">${esc(x.raw)}</td>`+
-      (r?`<td style="padding:3px 6px;color:var(--acc)">${esc(r.num)} rev ${esc(r.rev)} ${esc(r.st)}${x.n>1?` <span style="color:var(--mute)">(latest of ${x.n})</span>`:""}</td><td style="padding:3px 6px">${esc(r.t)}</td>`
+      (r&&x.inDir?`<td style="padding:3px 6px;color:var(--mute)">${esc(r.num)} rev ${esc(r.rev)} ${esc(r.st)}</td><td style="padding:3px 6px;color:var(--mute)">Already in downloads folder</td>`
+      :r?`<td style="padding:3px 6px;color:var(--acc)">${esc(r.num)} rev ${esc(r.rev)} ${esc(r.st)}${x.n>1?` <span style="color:var(--mute)">(latest of ${x.n})</span>`:""}</td><td style="padding:3px 6px">${esc(r.t)}</td>`
         :`<td colspan="2" style="padding:3px 6px;color:var(--bad)">${x.nolink?"On register but no link":"Not found"}</td>`)+"</tr>";
   }
   $("matchOut").innerHTML=h+"</table>";
@@ -463,7 +466,7 @@ $("matchBtn").onclick=()=>{
   $("copyMiss").style.display=miss.length?"":"none";
 };
 $("copyMiss").onclick=async()=>{const t=pasteRes.filter(x=>!x.r).map(x=>x.raw).join("\r\n");try{await navigator.clipboard.writeText(t);$("matchSum").textContent+=" | copied";}catch(e){}};
-function tickPasted(){const ok=pasteRes.filter(x=>x.r);ok.forEach(x=>ticks.add(x.r.key));saveTicks();updSel();apply();return ok.map(x=>x.r);}
+function tickPasted(){const ok=pasteRes.filter(x=>x.r&&!x.inDir);ok.forEach(x=>ticks.add(x.r.key));saveTicks();updSel();apply();return ok.map(x=>x.r);}
 $("pasteTick").onclick=()=>{const n=tickPasted().length;$("paste").close();msg(n+" items ticked from your list.");};
 $("pasteDl").onclick=()=>{
   const big=Number.MAX_SAFE_INTEGER;
@@ -481,6 +484,28 @@ const DBN="pld_db",ST="reg";
 function idb(){return new Promise((res,rej)=>{const o=indexedDB.open(DBN,1);o.onupgradeneeded=()=>o.result.createObjectStore(ST);o.onsuccess=()=>res(o.result);o.onerror=()=>rej(o.error);});}
 async function idbGet(){try{const d=await idb();return await new Promise(r=>{const q=d.transaction(ST).objectStore(ST).get("cur");q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);});}catch(e){return null}}
 async function idbPut(v){try{const d=await idb();await new Promise(r=>{const t=d.transaction(ST,"readwrite");v==null?t.objectStore(ST).delete("cur"):t.objectStore(ST).put(v,"cur");t.oncomplete=r;t.onerror=r;});}catch(e){}}
+/* downloads folder check: names of files directly in the chosen folder (no subfolders) */
+async function kvGet(k){try{const d=await idb();return await new Promise(r=>{const q=d.transaction(ST).objectStore(ST).get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);});}catch(e){return null}}
+async function kvPut(k,v){try{const d=await idb();await new Promise(r=>{const t=d.transaction(ST,"readwrite");t.objectStore(ST).put(v,k);t.oncomplete=r;t.onerror=r;});}catch(e){}}
+let dirH=null;
+const dirKey=n=>String(n||"").toLowerCase().replace(/ \(\d+\)(\.[^.]*)?$/,"$1");
+function showDir(note){$("dirName").textContent=note||(dirH?dirH.name:"Choose downloads folder");}
+async function dirNames(){
+  if(!dirH)return null;
+  try{
+    let p=await dirH.queryPermission({mode:"read"});
+    if(p!=="granted")p=await dirH.requestPermission({mode:"read"});
+    if(p!=="granted"){showDir(dirH.name+" (not allowed)");return null;}
+    const set=new Set();
+    for await(const [name,h] of dirH.entries())if(h.kind==="file")set.add(dirKey(name));
+    showDir();return set;
+  }catch(e){showDir(dirH.name+" (could not read)");return null;}
+}
+if(window.showDirectoryPicker){
+  $("dirBtn").style.display="inline-flex";
+  kvGet("dir").then(h=>{if(h){dirH=h;showDir();}});
+  $("dirBtn").onclick=async()=>{try{dirH=await window.showDirectoryPicker({id:"kcgm-downloads",mode:"read",startIn:"downloads"});await kvPut("dir",dirH);showDir();if($("pasteTxt").value.trim())$("matchBtn").click();}catch(e){}};
+}
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
 function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.toLocaleString()+" items"}
 
