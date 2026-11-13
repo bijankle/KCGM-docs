@@ -26,7 +26,7 @@ header .logo{flex:none}
 header .src{color:var(--mute);font-size:12px}
 header .sp{flex:1}
 .wrap{flex:1;display:flex;min-height:0}
-aside{width:300px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:12px 14px}
+aside{width:230px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:12px 14px}
 aside h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin:16px 0 6px;display:flex;justify-content:space-between;align-items:center}
 aside h3 a{text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer;color:var(--acc)}
 .pills{display:flex;flex-wrap:wrap;gap:5px}
@@ -79,7 +79,22 @@ dialog{border:1px solid var(--line);border-radius:10px;background:var(--panel);c
 dialog::backdrop{background:rgba(0,0,0,.4)}
 .help{font-size:13px;color:var(--mute)}
 .help ol{padding-left:18px;margin:6px 0}
-@media (max-width:800px){aside{display:none}.thead,.row{grid-template-columns:32px 150px 40px 50px 1fr 0 44px}}
+#tree{width:290px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:10px 8px 10px 6px;font-size:13px}
+#tree h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin:2px 0 6px 8px;font-weight:600}
+#treeGrip{width:6px;margin:0 -3px;flex:none;cursor:col-resize;z-index:2;touch-action:none}
+.tn{display:flex;align-items:center;gap:5px;min-height:26px;border-radius:4px}
+.tn:hover{background:var(--soft)}
+.tn .tw{width:12px;display:inline-flex;color:var(--mute);cursor:pointer;flex:none}
+.tn .tw svg.o{transform:rotate(90deg)}
+.tn input{margin:0;flex:none}
+.tn .fd{flex:none;color:var(--mute)}
+.tn .nm{flex:1;min-width:0;overflow:hidden;white-space:nowrap;cursor:pointer}
+.tn.wrap .nm{white-space:normal}
+.tn .mr{display:none;color:var(--acc);font-size:12px;cursor:pointer;flex:none}
+.tn .ct{color:var(--mute);font-size:11px;flex:none;margin-left:6px}
+.tn.zero{opacity:.45}
+.tn.off .nm{color:var(--mute)}
+@media (max-width:800px){#tree,#treeGrip{display:none}aside{display:none}.thead,.row{grid-template-columns:32px 150px 40px 50px 1fr 0 44px}}
 </style>
 </head>
 <body>
@@ -91,6 +106,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </header>
 <div id="msg"></div>
 <div class="wrap">
+  <nav id="tree"><h3>Folders</h3><div id="treeBody"></div></nav>
+  <div id="treeGrip" title="Drag to resize"></div>
   <aside id="side">
     <label class="tog"><input type="checkbox" id="hideSup" checked> Hide superseded, cancelled and markups</label>
     <label class="tog"><input type="checkbox" id="onlyLink" checked> Only items with a link</label>
@@ -174,7 +191,8 @@ function mk(name,url,num,rev,st,t){
   const a=attrs(num||name,url,name);
   const sup=SUP_ST.has(st)||/\/superseded\//i.test(url)||/-(RLM|GLM)\d*$/i.test(num);
   const key=num||name||url;
-  const r={name,u:url,num,rev,st,t,...a,sup,key};
+  const fm=url.replace(/:[a-z]:\/r\//,"").match(/\/Shared Documents\/(.*)\/[^/]*$/);
+  const r={name,u:url,num,rev,st,t,...a,sup,key,fp:fm?fm[1]:""};
   r.hay=[name,num,rev,st,t,url,a.area,a.pkg,a.type,a.disc,a.lib,a.ext].join(" \u0001 ").toLowerCase();
   return r;
 }
@@ -205,12 +223,13 @@ function groupOk(r,skip){
 function apply(){
   const qt=$("q").value.toLowerCase().split(/\s+/).filter(Boolean);
   const base=ROWS.filter(r=>baseOk(r,qt));
-  shown=base.filter(r=>groupOk(r,null));
+  shown=base.filter(r=>groupOk(r,null)&&folderOk(r));
+  treeCounts(base);
   const counts={};GROUPS.forEach(([k])=>counts[k]=new Map());
-  for(const r of base){for(const [k] of GROUPS){if(groupOk(r,k)){const v=r[k]||"(none)";counts[k].set(v,(counts[k].get(v)||0)+1);}}}
+  for(const r of base){if(!folderOk(r))continue;for(const [k] of GROUPS){if(groupOk(r,k)){const v=r[k]||"(none)";counts[k].set(v,(counts[k].get(v)||0)+1);}}}
   const all={};GROUPS.forEach(([k])=>all[k]=new Map());
   for(const r of ROWS){for(const [k] of GROUPS){const v=r[k]||"(none)";all[k].set(v,(all[k].get(v)||0)+1);}}
-  sortRows();renderGroups(counts,all);renderChips();renderTable();
+  sortRows();renderGroups(counts,all);renderChips();renderTree();renderTable();
   $("copyNote").textContent="";
   $("count").textContent=shown.length.toLocaleString()+" of "+ROWS.length.toLocaleString()+" shown";
 }
@@ -247,9 +266,51 @@ $("groups").addEventListener("click",e=>{
 function renderChips(){
   let h="";
   for(const [k,label] of GROUPS)for(const v of fsel[k])h+=`<span class="chip">${label}: ${esc(v)}<b data-g="${k}" data-v="${esc(v)}">&times;</b></span>`;
+  if(foff.size){const n=[...NODES.values()].filter(x=>x.own&&foff.has(x.p)).length;if(n)h+=`<span class="chip">Folders: ${n.toLocaleString()} unticked<b data-fall="1" title="Tick all folders">&times;</b></span>`;}
   $("chips").innerHTML=h;
 }
-$("chips").addEventListener("click",e=>{const b=e.target.closest("b");if(b){fsel[b.dataset.g].delete(b.dataset.v);apply();}});
+$("chips").addEventListener("click",e=>{const b=e.target.closest("b");if(!b)return;if(b.dataset.fall){foff.clear();saveF();apply();return;}fsel[b.dataset.g].delete(b.dataset.v);apply();});
+
+/* folder tree */
+const NOLINK="(no link)",FK="pld_folders_v1";
+let TREE={kids:[]},NODES=new Map(),foff=new Set(),fopen=new Set(["KCGM Controlled Library"]);const fwrap=new Set();
+try{const v=JSON.parse(localStorage.getItem(FK)||"null");if(v){foff=new Set(v.off||[]);fopen=new Set(v.open||[]);if(v.w)$("tree").style.width=v.w+"px";}}catch(e){}
+function saveF(){try{localStorage.setItem(FK,JSON.stringify({off:[...foff],open:[...fopen],w:parseInt($("tree").style.width)||0}))}catch(e){}}
+function buildTree(){
+  TREE={kids:[]};NODES=new Map();
+  const get=p=>{let n=NODES.get(p);if(n)return n;const i=p.lastIndexOf("/");const par=i<0?TREE:get(p.slice(0,i));n={p,n:p.slice(i+1),kids:[],par,own:0,c:0};par.kids.push(n);NODES.set(p,n);return n;};
+  for(const r of ROWS){r.node=get(r.fp||NOLINK);r.node.own++;}
+  const srt=n=>{n.kids.sort((a,b)=>(a.p===NOLINK)-(b.p===NOLINK)||a.n.localeCompare(b.n,undefined,{numeric:true}));n.kids.forEach(srt);};srt(TREE);
+  foff=new Set([...foff].filter(p=>NODES.has(p)));
+}
+function folderOk(r){return !foff.has(r.node.p);}
+function treeCounts(base){for(const n of NODES.values())n.c=0;for(const r of base){if(!groupOk(r,null))continue;for(let n=r.node;n&&n!==TREE;n=n.par)n.c++;}}
+function tstate(n){let on=n.own&&!foff.has(n.p)?1:0,tot=n.own?1:0;for(const k of n.kids){tstate(k);on+=k.on;tot+=k.tot;}n.on=on;n.tot=tot;n.st=on===tot?"on":on===0?"off":"part";}
+function subtree(n,f){f(n);n.kids.forEach(k=>subtree(k,f));}
+const CHEV='<svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const FOLD=o=>`<svg class="fd" width="15" height="15" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z" fill="${o?"var(--acc-soft)":"none"}" stroke="currentColor" stroke-width="1.7"/></svg>`;
+function renderTree(){
+  TREE.kids.forEach(tstate);
+  let h="";
+  const walk=(list,d)=>{for(const n of list){const o=fopen.has(n.p),k=n.kids.length;
+    h+=`<div class="tn${n.st==="off"?" off":""}${n.c?"":" zero"}${fwrap.has(n.p)?" wrap":""}" data-p="${esc(n.p)}" style="padding-left:${d*16}px"><span class="tw">${k?CHEV.replace("<svg",o?'<svg class="o"':"<svg"):""}</span><input type="checkbox"${n.st==="on"?" checked":""}${n.st==="part"?' data-part="1"':""} title="Tick or untick this folder and everything in it">${FOLD(o&&k)}<span class="nm" title="Show only this folder">${esc(n.n)}</span><span class="mr">more…</span><span class="ct">${n.c.toLocaleString()}</span></div>`;
+    if(o&&k)walk(n.kids,d+1);}};
+  walk(TREE.kids,0);
+  const body=$("treeBody");body.innerHTML=h;
+  body.querySelectorAll("[data-part]").forEach(i=>i.indeterminate=true);
+  body.querySelectorAll(".tn:not(.wrap)").forEach(r=>{const nm=r.querySelector(".nm");if(nm.scrollWidth>nm.clientWidth+1)r.querySelector(".mr").style.display="inline";});
+}
+$("treeBody").addEventListener("click",e=>{
+  const row=e.target.closest(".tn");if(!row)return;const n=NODES.get(row.dataset.p);if(!n)return;
+  if(e.target.closest(".tw")){if(!n.kids.length)return;fopen.has(n.p)?fopen.delete(n.p):fopen.add(n.p);saveF();renderTree();return;}
+  if(e.target.closest(".mr")){fwrap.add(n.p);renderTree();return;}
+  if(e.target.matches("input")){const on=n.st!=="on";subtree(n,x=>on?foff.delete(x.p):foff.add(x.p));saveF();apply();return;}
+  if(e.target.closest(".nm")){const keep=new Set();subtree(n,x=>keep.add(x.p));foff=new Set([...NODES.keys()].filter(p=>!keep.has(p)));for(let x=n.par;x&&x!==TREE;x=x.par)fopen.add(x.p);saveF();apply();}
+});
+(()=>{const g=$("treeGrip"),t=$("tree");let x0=0,w0=0,on=false;
+  g.addEventListener("pointerdown",e=>{on=true;x0=e.clientX;w0=t.getBoundingClientRect().width;g.setPointerCapture(e.pointerId);e.preventDefault();});
+  g.addEventListener("pointermove",e=>{if(!on)return;t.style.width=Math.max(180,Math.min(700,w0+e.clientX-x0))+"px";renderTree();});
+  g.addEventListener("pointerup",()=>{if(on){on=false;saveF();}});})();
 
 /* virtual table */
 const RH=30,vp=$("vp"),sz=$("sz");
@@ -423,7 +484,7 @@ function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.to
 
 /* start */
 const BUILT=JSON.parse($("data").textContent);
-loadPacked(BUILT);
+loadPacked(BUILT);buildTree();
 showSrc();updSel();apply();
 idbPut(null); /* uploads were removed; drop any copy left from an earlier upload so everyone sees the built in register */
 })();
