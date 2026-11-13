@@ -391,23 +391,53 @@ function fire(r){
   const f=document.createElement("iframe");f.style.display="none";f.src=u;document.body.appendChild(f);setTimeout(()=>f.remove(),120000);return true;
 }
 function setProg(i,n){$("fill").style.width=(n?100*i/n:0)+"%";$("progT").textContent=n?i+" of "+n:"";}
-function step(){
-  if(!run)return;
+/* With a downloads folder chosen, two files download at a time and the next starts as soon as one finishes.
+   Chrome and Edge save to name.crdownload while downloading and rename to the real name when done,
+   so a file counts as finished when its real name appears in the folder. */
+const SLOTS=2,sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function listNames(){if(!dirH)return null;try{if(await dirH.queryPermission({mode:"read"})!=="granted")return null;const a=[];for await(const [n,h] of dirH.entries())if(h.kind==="file")a.push(n);return a;}catch(e){return null}}
+async function dirReady(){if(!dirH)return false;try{let p=await dirH.queryPermission({mode:"read"});if(p!=="granted")p=await dirH.requestPermission({mode:"read"});return p==="granted";}catch(e){return false}}
+const giveUp=r=>Math.max(120000,(r.size||0)/150);  /* move on after 2 min, or longer for big files (150 KB/s) */
+function endMsg(me){return "Done. "+me.list.length+" files requested."+(me.late?" "+me.late+" took too long to appear in the downloads folder, so the next one started anyway.":"")+" Check your downloads list (Ctrl+J) for any that did not arrive.";}
+function go(){run&&(run.dir?pump():stepGap());}
+async function pump(){
+  const me=run;if(!me||me.paused||me.busy)return;me.busy=true;me.fly=me.fly||[];me.fin=me.fin||0;me.late=me.late||0;
+  try{
+    while(run===me&&!me.paused){
+      while(me.fly.length<SLOTS&&me.i<me.list.length){
+        const r=me.list[me.i],before=new Set(await listNames()||[]);
+        if(run!==me||me.paused)return;
+        if(!fire(r)){msg("The browser blocked the pop up. Allow pop ups for this page (icon at the right of the address bar), then click Resume.");pause();return;}
+        done.add(r.key);me.i++;me.fly.push({r,before,t0:Date.now()});renderTable();
+      }
+      if(!me.fly.length){finish(endMsg(me));return;}
+      setProg(me.fin,me.list.length);$("progT").textContent=me.fin+" of "+me.list.length+" done, "+me.fly.length+" downloading";
+      await sleep(500);
+      if(run!==me||me.paused)return;
+      const names=await listNames();
+      if(!names){me.dir=false;me.fly=[];msg("Lost access to the downloads folder, so the rest will go out one by one with the gap.");stepGap();return;}
+      me.fly=me.fly.filter(f=>{const k=dirKey(f.r.name);const got=names.some(n=>!f.before.has(n)&&dirKey(n)===k);const late=!got&&Date.now()-f.t0>giveUp(f.r);if(late)me.late++;if(got||late){me.fin++;return false;}return true;});
+    }
+  }finally{me.busy=false;}
+}
+function stepGap(){
+  if(!run||run.paused)return;
   if(run.i>=run.list.length){finish("Done. "+run.list.length+" files requested. Check your downloads list (Ctrl+J) for any that did not arrive.");return;}
   const r=run.list[run.i];
   if(!fire(r)){msg("The browser blocked the pop up. Allow pop ups for this page (icon at the right of the address bar), then click Resume.");pause();return;}
   done.add(r.key);run.i++;setProg(run.i,run.list.length);renderTable();
-  run.t=setTimeout(step,Math.max(300,(+$("gap").value||1.5)*1000));
+  run.t=setTimeout(stepGap,Math.max(300,(+$("gap").value||1.5)*1000));
 }
 function pause(){if(!run)return;clearTimeout(run.t);run.paused=true;$("stopBtn").style.display="none";$("dlBtn").textContent="Resume ("+(run.list.length-run.i)+" left)";$("dlBtn").disabled=false;}
 function finish(t){clearTimeout(run&&run.t);run=null;$("stopBtn").style.display="none";$("dlBtn").disabled=false;updSel();msg(t);}
-$("dlBtn").onclick=()=>{
-  if(run&&run.paused){run.paused=false;msg("");$("stopBtn").style.display="";$("dlBtn").disabled=true;step();return;}
+$("dlBtn").onclick=async()=>{
+  if(run&&run.paused){run.paused=false;msg("");$("stopBtn").style.display="";$("dlBtn").disabled=true;go();return;}
   const list=tickedRows();
   if(!list.length)return msg("Tick some items first.");
   if(list.length>50&&!confirm(list.length+" files is a large batch. SharePoint may throttle or the browser may struggle above about 50 at a time. Continue anyway?"))return;
-  run={list,i:0,t:0,paused:false};msg("");setProg(0,list.length);
-  $("stopBtn").style.display="";$("dlBtn").disabled=true;step();
+  const dir=await dirReady();
+  run={list,i:0,t:0,paused:false,dir};msg("");setProg(0,list.length);
+  $("stopBtn").style.display="";$("dlBtn").disabled=true;go();
 };
 $("stopBtn").onclick=()=>{if(run){const k=run.i;finish("Stopped after "+k+" of "+run.list.length+". Untick the ones already requested (marked with a dot) and run again to continue.");}};
 $("testBtn").onclick=()=>{
@@ -471,13 +501,14 @@ $("matchBtn").onclick=async()=>{
 $("copyMiss").onclick=async()=>{const t=pasteRes.filter(x=>!x.r).map(x=>x.raw).join("\r\n");try{await navigator.clipboard.writeText(t);$("matchSum").textContent+=" | copied";}catch(e){}};
 function tickPasted(){const ok=pasteRes.filter(x=>x.r&&!x.inDir);ok.forEach(x=>ticks.add(x.r.key));saveTicks();updSel();apply();return ok.map(x=>x.r);}
 $("pasteTick").onclick=()=>{const n=tickPasted().length;$("paste").close();msg(n+" items ticked from your list.");};
-$("pasteDl").onclick=()=>{
+$("pasteDl").onclick=async()=>{
   const big=Number.MAX_SAFE_INTEGER;
   const list=tickPasted().slice().sort((a,b)=>(a.size>0?a.size:big)-(b.size>0?b.size:big)); /* smallest files first, unknown sizes last */
   $("paste").close();
   if(run)return msg("A download is already running.");
   if(list.length>50&&!confirm(list.length+" files is a large batch. Continue anyway?"))return;
-  run={list,i:0,t:0,paused:false};msg("");setProg(0,list.length);$("stopBtn").style.display="";$("dlBtn").disabled=true;step();
+  const dir=await dirReady();
+  run={list,i:0,t:0,paused:false,dir};msg("");setProg(0,list.length);$("stopBtn").style.display="";$("dlBtn").disabled=true;go();
 };
 
 /* help */
