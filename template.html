@@ -6,8 +6,8 @@
 <title>Project Library Downloader</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#3e4a5f">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%233e4a5f%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2010.5V23a1.5%201.5%200%200%200%201.5%201.5h17A1.5%201.5%200%200%200%2026%2023v-10a1.5%201.5%200%200%200-1.5-1.5H16l-2.5-3H7.5A1.5%201.5%200%200%200%206%2010z%22%2F%3E%3Cpath%20d%3D%22M16%2014.5v6.5M13%2018l3%203%203-3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
-<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%23475569%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2010.5V23a1.5%201.5%200%200%200%201.5%201.5h17A1.5%201.5%200%200%200%2026%2023v-10a1.5%201.5%200%200%200-1.5-1.5H16l-2.5-3H7.5A1.5%201.5%200%200%200%206%2010z%22%2F%3E%3Cpath%20d%3D%22M16%2014.5v6.5M13%2018l3%203%203-3%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
 <style>
 :root{--bg:#f4f5f7;--panel:#fff;--ink:#1f2633;--mute:#64748b;--line:#d9dde4;--soft:#eef0f4;--acc:#3e4a5f;--acc-soft:#e6eaf1;--acc-ink:#2b3442;--warn:#854f0b;--warn-soft:#faeeda;--bad:#a32d2d;--row-sel:#e9edf4}
 @media (prefers-color-scheme:dark){:root{--bg:#171a20;--panel:#1f232b;--ink:#e6e9ee;--mute:#9aa3b2;--line:#343a46;--soft:#282d37;--acc:#9fb0cc;--acc-soft:#2a3343;--acc-ink:#d4dcea;--warn:#efb35a;--warn-soft:#3a2c14;--bad:#f09595;--row-sel:#263041}}
@@ -26,7 +26,7 @@ header .logo{flex:none}
 header .src{color:var(--mute);font-size:12px}
 header .sp{flex:1}
 .wrap{flex:1;display:flex;min-height:0}
-aside{width:300px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:12px 14px}
+aside{width:230px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:12px 14px}
 aside h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin:16px 0 6px;display:flex;justify-content:space-between;align-items:center}
 aside h3 a{text-transform:none;letter-spacing:0;font-weight:400;cursor:pointer;color:var(--acc)}
 .pills{display:flex;flex-wrap:wrap;gap:5px}
@@ -42,6 +42,10 @@ main{flex:1;display:flex;flex-direction:column;min-width:0}
 .bar{display:flex;gap:8px;align-items:center;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--panel)}
 .bar input[type=search]{flex:1;min-width:220px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
 .count{color:var(--mute);font-size:13px;white-space:nowrap}
+.seg{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg .lbl{display:inline-flex;align-items:center;gap:5px;padding:0 9px;color:var(--mute);font-size:13px}
+.seg button{border:0;border-left:1px solid var(--line);border-radius:0}
+.seg button:hover{background:var(--soft)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px}
 .chips:not(:empty){padding:8px 14px;border-bottom:1px solid var(--line)}
 .chip{font-size:12px;background:var(--acc-soft);color:var(--acc-ink);border-radius:999px;padding:2px 4px 2px 9px}
@@ -75,22 +79,35 @@ dialog{border:1px solid var(--line);border-radius:10px;background:var(--panel);c
 dialog::backdrop{background:rgba(0,0,0,.4)}
 .help{font-size:13px;color:var(--mute)}
 .help ol{padding-left:18px;margin:6px 0}
-@media (max-width:800px){aside{display:none}.thead,.row{grid-template-columns:32px 150px 40px 50px 1fr 0 44px}}
+#tree{width:290px;flex:none;overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding:10px 8px 10px 6px;font-size:13px}
+#tree h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin:2px 0 6px 8px;font-weight:600}
+#treeGrip{width:6px;margin:0 -3px;flex:none;cursor:col-resize;z-index:2;touch-action:none}
+.tn{display:flex;align-items:center;gap:5px;min-height:26px;border-radius:4px}
+.tn:hover{background:var(--soft)}
+.tn .tw{width:12px;display:inline-flex;color:var(--mute);cursor:pointer;flex:none}
+.tn .tw svg.o{transform:rotate(90deg)}
+.tn input{margin:0;flex:none}
+.tn .fd{flex:none;color:var(--mute)}
+.tn .nm{flex:1;min-width:0;overflow:hidden;white-space:nowrap;cursor:pointer}
+.tn.wrap .nm{white-space:normal}
+.tn .mr{display:none;color:var(--acc);font-size:12px;cursor:pointer;flex:none}
+.tn .ct{color:var(--mute);font-size:11px;flex:none;margin-left:6px}
+.tn.zero{opacity:.45}
+.tn.off .nm{color:var(--mute)}
+@media (max-width:800px){#tree,#treeGrip{display:none}aside{display:none}.thead,.row{grid-template-columns:32px 150px 40px 50px 1fr 0 44px}}
 </style>
 </head>
 <body>
 <header>
-  <h1><svg class="logo" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#3e4a5f"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10.5V23a1.5 1.5 0 0 0 1.5 1.5h17A1.5 1.5 0 0 0 26 23v-10a1.5 1.5 0 0 0-1.5-1.5H16l-2.5-3H7.5A1.5 1.5 0 0 0 6 10z"/><path d="M16 14.5v6.5M13 18l3 3 3-3"/></g></svg>Project Library Downloader</h1>
+  <h1><svg class="logo" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#475569"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10.5V23a1.5 1.5 0 0 0 1.5 1.5h17A1.5 1.5 0 0 0 26 23v-10a1.5 1.5 0 0 0-1.5-1.5H16l-2.5-3H7.5A1.5 1.5 0 0 0 6 10z"/><path d="M16 14.5v6.5M13 18l3 3 3-3"/></g></svg>Project Library Downloader</h1>
   <span class="src" id="src"></span>
   <span class="sp"></span>
-  <button id="helpBtn">How it works</button>
   <button class="pri" id="pasteBtn">Paste a list</button>
-  <button id="upBtn">Update register</button>
-  <button id="resetBtn" style="display:none">Use built in register</button>
-  <input type="file" id="upFile" accept=".xlsx,.xlsm,.xls,.csv" hidden>
 </header>
 <div id="msg"></div>
 <div class="wrap">
+  <nav id="tree"><h3>Folders</h3><div id="treeBody"></div></nav>
+  <div id="treeGrip" title="Drag to resize"></div>
   <aside id="side">
     <label class="tog"><input type="checkbox" id="hideSup" checked> Hide superseded, cancelled and markups</label>
     <label class="tog"><input type="checkbox" id="onlyLink" checked> Only items with a link</label>
@@ -101,9 +118,6 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <div class="bar">
       <input type="search" id="q" placeholder="Search every column, e.g. CV-402 tail, drift switch, F12 DRG">
       <span class="count" id="count"></span>
-      <button id="tickAll">Tick all shown</button>
-      <button id="untickAll">Untick all</button>
-      <button id="clearF">Clear filters</button>
     </div>
     <div class="chips" id="chips"></div>
     <div class="thead" id="thead">
@@ -115,6 +129,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </div>
 <footer>
   <strong id="selCount">0 ticked</strong>
+  <span class="seg"><span class="lbl"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M10 9v11"/></svg>Copy table</span><button id="copyView" title="Copy every row the current filters and search show: Doc Number, Rev, Title, SharePoint Link">View</button><button id="copyTicks" title="Copy the ticked files: Doc Number, Rev, Title, SharePoint Link">Ticked</button></span>
+  <span class="count" id="copyNote"></span>
   <button id="clearSel">Clear ticks</button>
   <button id="copyBtn">Copy links</button>
   <button id="csvBtn">Export list</button>
@@ -138,22 +154,6 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <button id="pasteTick" disabled>Tick matched</button>
     <button class="pri" id="pasteDl" disabled>Tick and download</button>
   </div>
-</dialog>
-<dialog id="help">
-  <h3 style="margin-top:0">How it works</h3>
-  <div class="help">
-  <ol>
-    <li>Open this file in the browser you use for SharePoint, and make sure you are signed in to SharePoint in another tab.</li>
-    <li>Search and use the pills to narrow the list. Pills in the same group widen the match, pills in different groups narrow it.</li>
-    <li>Tick the items you want. Ticks are remembered in this browser.</li>
-    <li>Click <b>Test one file</b> first. If the browser asks to allow pop ups or multiple downloads from this page, choose Allow.</li>
-    <li>Or click <b>Paste a list</b>, paste doc numbers or file names one per line, then Tick and download. The latest revision of each is used.</li>
-    <li>Click <b>Download all ticked</b>. Each file is opened one after the other with a short gap. Leave the page open until the bar is full.</li>
-  </ol>
-  <p>If nothing arrives with the Background method, switch to New tab per file. Force download asks SharePoint to save the file rather than preview it. If files open in a preview instead of saving, untick it to see whether the links work at all.</p>
-  <p>Update register loads a newer copy of the register (.xlsm, .xlsx or .csv with URL, Doc Number, Rev, Status and Title columns). It is kept in this browser until you choose Use built in register.</p>
-  </div>
-  <form method="dialog" style="text-align:right"><button class="pri">OK</button></form>
 </dialog>
 <script type="application/json" id="data">__DATA__</script>
 <script>
@@ -191,7 +191,8 @@ function mk(name,url,num,rev,st,t){
   const a=attrs(num||name,url,name);
   const sup=SUP_ST.has(st)||/\/superseded\//i.test(url)||/-(RLM|GLM)\d*$/i.test(num);
   const key=num||name||url;
-  const r={name,u:url,num,rev,st,t,...a,sup,key};
+  const fm=url.replace(/:[a-z]:\/r\//,"").match(/\/Shared Documents\/(.*)\/[^/]*$/);
+  const r={name,u:url,num,rev,st,t,...a,sup,key,fp:fm?fm[1]:""};
   r.hay=[name,num,rev,st,t,url,a.area,a.pkg,a.type,a.disc,a.lib,a.ext].join(" \u0001 ").toLowerCase();
   return r;
 }
@@ -222,12 +223,14 @@ function groupOk(r,skip){
 function apply(){
   const qt=$("q").value.toLowerCase().split(/\s+/).filter(Boolean);
   const base=ROWS.filter(r=>baseOk(r,qt));
-  shown=base.filter(r=>groupOk(r,null));
+  shown=base.filter(r=>groupOk(r,null)&&folderOk(r));
+  treeCounts(base);
   const counts={};GROUPS.forEach(([k])=>counts[k]=new Map());
-  for(const r of base){for(const [k] of GROUPS){if(groupOk(r,k)){const v=r[k]||"(none)";counts[k].set(v,(counts[k].get(v)||0)+1);}}}
+  for(const r of base){if(!folderOk(r))continue;for(const [k] of GROUPS){if(groupOk(r,k)){const v=r[k]||"(none)";counts[k].set(v,(counts[k].get(v)||0)+1);}}}
   const all={};GROUPS.forEach(([k])=>all[k]=new Map());
   for(const r of ROWS){for(const [k] of GROUPS){const v=r[k]||"(none)";all[k].set(v,(all[k].get(v)||0)+1);}}
-  sortRows();renderGroups(counts,all);renderChips();renderTable();
+  sortRows();renderGroups(counts,all);renderChips();renderTree();renderTable();
+  $("copyNote").textContent="";
   $("count").textContent=shown.length.toLocaleString()+" of "+ROWS.length.toLocaleString()+" shown";
 }
 function revKey(v){v=String(v||"").trim().toUpperCase();const m=v.match(/^(\d+(?:\.\d+)?)(.*)$/);if(m)return[2,parseFloat(m[1]),m[2]];if(/^[A-Z]/.test(v))return[1,0,v];return[0,0,v];}
@@ -263,9 +266,51 @@ $("groups").addEventListener("click",e=>{
 function renderChips(){
   let h="";
   for(const [k,label] of GROUPS)for(const v of fsel[k])h+=`<span class="chip">${label}: ${esc(v)}<b data-g="${k}" data-v="${esc(v)}">&times;</b></span>`;
+  if(foff.size){const n=[...NODES.values()].filter(x=>x.own&&foff.has(x.p)).length;if(n)h+=`<span class="chip">Folders: ${n.toLocaleString()} unticked<b data-fall="1" title="Tick all folders">&times;</b></span>`;}
   $("chips").innerHTML=h;
 }
-$("chips").addEventListener("click",e=>{const b=e.target.closest("b");if(b){fsel[b.dataset.g].delete(b.dataset.v);apply();}});
+$("chips").addEventListener("click",e=>{const b=e.target.closest("b");if(!b)return;if(b.dataset.fall){foff.clear();saveF();apply();return;}fsel[b.dataset.g].delete(b.dataset.v);apply();});
+
+/* folder tree */
+const NOLINK="(no link)",FK="pld_folders_v1";
+let TREE={kids:[]},NODES=new Map(),foff=new Set(),fopen=new Set(["KCGM Controlled Library"]);const fwrap=new Set();
+try{const v=JSON.parse(localStorage.getItem(FK)||"null");if(v){foff=new Set(v.off||[]);fopen=new Set(v.open||[]);if(v.w)$("tree").style.width=v.w+"px";}}catch(e){}
+function saveF(){try{localStorage.setItem(FK,JSON.stringify({off:[...foff],open:[...fopen],w:parseInt($("tree").style.width)||0}))}catch(e){}}
+function buildTree(){
+  TREE={kids:[]};NODES=new Map();
+  const get=p=>{let n=NODES.get(p);if(n)return n;const i=p.lastIndexOf("/");const par=i<0?TREE:get(p.slice(0,i));n={p,n:p.slice(i+1),kids:[],par,own:0,c:0};par.kids.push(n);NODES.set(p,n);return n;};
+  for(const r of ROWS){r.node=get(r.fp||NOLINK);r.node.own++;}
+  const srt=n=>{n.kids.sort((a,b)=>(a.p===NOLINK)-(b.p===NOLINK)||a.n.localeCompare(b.n,undefined,{numeric:true}));n.kids.forEach(srt);};srt(TREE);
+  foff=new Set([...foff].filter(p=>NODES.has(p)));
+}
+function folderOk(r){return !foff.has(r.node.p);}
+function treeCounts(base){for(const n of NODES.values())n.c=0;for(const r of base){if(!groupOk(r,null))continue;for(let n=r.node;n&&n!==TREE;n=n.par)n.c++;}}
+function tstate(n){let on=n.own&&!foff.has(n.p)?1:0,tot=n.own?1:0;for(const k of n.kids){tstate(k);on+=k.on;tot+=k.tot;}n.on=on;n.tot=tot;n.st=on===tot?"on":on===0?"off":"part";}
+function subtree(n,f){f(n);n.kids.forEach(k=>subtree(k,f));}
+const CHEV='<svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const FOLD=o=>`<svg class="fd" width="15" height="15" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z" fill="${o?"var(--acc-soft)":"none"}" stroke="currentColor" stroke-width="1.7"/></svg>`;
+function renderTree(){
+  TREE.kids.forEach(tstate);
+  let h="";
+  const walk=(list,d)=>{for(const n of list){const o=fopen.has(n.p),k=n.kids.length;
+    h+=`<div class="tn${n.st==="off"?" off":""}${n.c?"":" zero"}${fwrap.has(n.p)?" wrap":""}" data-p="${esc(n.p)}" style="padding-left:${d*16}px"><span class="tw">${k?CHEV.replace("<svg",o?'<svg class="o"':"<svg"):""}</span><input type="checkbox"${n.st==="on"?" checked":""}${n.st==="part"?' data-part="1"':""} title="Tick or untick this folder and everything in it">${FOLD(o&&k)}<span class="nm" title="Show only this folder">${esc(n.n)}</span><span class="mr">more…</span><span class="ct">${n.c.toLocaleString()}</span></div>`;
+    if(o&&k)walk(n.kids,d+1);}};
+  walk(TREE.kids,0);
+  const body=$("treeBody");body.innerHTML=h;
+  body.querySelectorAll("[data-part]").forEach(i=>i.indeterminate=true);
+  body.querySelectorAll(".tn:not(.wrap)").forEach(r=>{const nm=r.querySelector(".nm");if(nm.scrollWidth>nm.clientWidth+1)r.querySelector(".mr").style.display="inline";});
+}
+$("treeBody").addEventListener("click",e=>{
+  const row=e.target.closest(".tn");if(!row)return;const n=NODES.get(row.dataset.p);if(!n)return;
+  if(e.target.closest(".tw")){if(!n.kids.length)return;fopen.has(n.p)?fopen.delete(n.p):fopen.add(n.p);saveF();renderTree();return;}
+  if(e.target.closest(".mr")){fwrap.add(n.p);renderTree();return;}
+  if(e.target.matches("input")){const on=n.st!=="on";subtree(n,x=>on?foff.delete(x.p):foff.add(x.p));saveF();apply();return;}
+  if(e.target.closest(".nm")){const keep=new Set();subtree(n,x=>keep.add(x.p));foff=new Set([...NODES.keys()].filter(p=>!keep.has(p)));for(let x=n.par;x&&x!==TREE;x=x.par)fopen.add(x.p);saveF();apply();}
+});
+(()=>{const g=$("treeGrip"),t=$("tree");let x0=0,w0=0,on=false;
+  g.addEventListener("pointerdown",e=>{on=true;x0=e.clientX;w0=t.getBoundingClientRect().width;g.setPointerCapture(e.pointerId);e.preventDefault();});
+  g.addEventListener("pointermove",e=>{if(!on)return;t.style.width=Math.max(180,Math.min(700,w0+e.clientX-x0))+"px";renderTree();});
+  g.addEventListener("pointerup",()=>{if(on){on=false;saveF();}});})();
 
 /* virtual table */
 const RH=30,vp=$("vp"),sz=$("sz");
@@ -298,13 +343,23 @@ function tickShown(on){
   if(on&&linked.length>500&&!confirm("Tick all "+linked.length.toLocaleString()+" items shown?")){updHdr();return;}
   linked.forEach(r=>on?ticks.add(r.key):ticks.delete(r.key));saveTicks();updSel();apply();
 }
-$("tickAll").onclick=()=>tickShown(true);
-$("untickAll").onclick=()=>{if(!ticks.size)return;const vis=new Set(shown.map(r=>r.key));const hid=[...ticks].filter(k=>!vis.has(k)).length;if(hid&&!confirm("Untick all "+ticks.size.toLocaleString()+" ticked, including "+hid.toLocaleString()+" not shown by the current filters?"))return;ticks.clear();saveTicks();updSel();apply();};
 $("thead").addEventListener("click",e=>{const d=e.target.closest("div[data-k]");if(!d)return;if(sortK===d.dataset.k)sortD=-sortD;else{sortK=d.dataset.k;sortD=1;}sortRows();renderTable();});
 function tickedRows(){return ROWS.filter(r=>ticks.has(r.key)&&r.u);}
-function updSel(){const n=tickedRows().length;$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
+function updSel(){const n=tickedRows().length;$("copyNote").textContent="";$("selCount").textContent=n.toLocaleString()+" ticked";$("dlBtn").textContent="Download all ticked"+(n?" ("+n+")":"");}
 $("clearSel").onclick=()=>{if(ticks.size&&confirm("Clear all "+ticks.size+" ticks?")){ticks.clear();saveTicks();updSel();apply();}};
-$("clearF").onclick=()=>{GROUPS.forEach(([k])=>fsel[k].clear());$("q").value="";apply();};
+function copyTable(rs,noteId,what){
+  const note=$(noteId);
+  if(!rs.length){note.textContent=what==="ticked"?"Nothing ticked":"Nothing shown";return;}
+  if(rs.length>5000&&!confirm("Copy "+rs.length.toLocaleString()+" rows? That is a lot to paste into an email."))return;
+  const H=["Doc Number","Rev","Title","SharePoint Link"];
+  const tsv=[H.join("\t")].concat(rs.map(r=>[r.num,r.rev,r.t,linkOf(r,false)].map(v=>String(v||"").replace(/[\t\r\n]+/g," ")).join("\t"))).join("\r\n");
+  const html='<table border="1" cellspacing="0" cellpadding="3"><tr>'+H.map(h=>"<th>"+esc(h)+"</th>").join("")+"</tr>"+rs.map(r=>{const u=linkOf(r,false);return"<tr><td>"+esc(r.num)+"</td><td>"+esc(r.rev)+"</td><td>"+esc(r.t)+"</td><td>"+(u?'<a href="'+esc(u)+'">'+esc(u)+"</a>":"")+"</td></tr>";}).join("")+"</table>";
+  const on=e=>{e.clipboardData.setData("text/html",html);e.clipboardData.setData("text/plain",tsv);e.preventDefault();};
+  document.addEventListener("copy",on);let ok=false;try{ok=document.execCommand("copy");}catch(e){}document.removeEventListener("copy",on);
+  note.textContent=ok?"Copied "+rs.length.toLocaleString()+(what==="ticked"?" ticked":" shown")+" rows":"Could not copy";
+}
+$("copyView").onclick=()=>copyTable(shown,"copyNote","view");
+$("copyTicks").onclick=()=>copyTable(tickedRows(),"copyNote","ticked");
 let qT=0;$("q").addEventListener("input",()=>{clearTimeout(qT);qT=setTimeout(apply,160)});
 ["hideSup","onlyLink","onlySel"].forEach(id=>$(id).addEventListener("change",apply));
 
@@ -418,7 +473,6 @@ $("pasteDl").onclick=()=>{
 };
 
 /* help */
-$("helpBtn").onclick=()=>$("help").showModal();
 
 /* upload update, stored in IndexedDB */
 const DBN="pld_db",ST="reg";
@@ -426,64 +480,13 @@ function idb(){return new Promise((res,rej)=>{const o=indexedDB.open(DBN,1);o.on
 async function idbGet(){try{const d=await idb();return await new Promise(r=>{const q=d.transaction(ST).objectStore(ST).get("cur");q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);});}catch(e){return null}}
 async function idbPut(v){try{const d=await idb();await new Promise(r=>{const t=d.transaction(ST,"readwrite");v==null?t.objectStore(ST).delete("cur"):t.objectStore(ST).put(v,"cur");t.oncomplete=r;t.onerror=r;});}catch(e){}}
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
-$("upBtn").onclick=()=>$("upFile").click();
-$("upFile").onchange=async e=>{
-  const f=e.target.files[0];e.target.value="";if(!f)return;
-  msg("Reading "+f.name+" ...");
-  try{
-    if(!window.XLSX)await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
-  }catch(err){return msg("Could not load the spreadsheet reader from the internet. Save the register as .csv and upload that instead, or check your connection.");}
-  try{
-    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
-    let rows=null,hi=-1,H=null;
-    for(const n of wb.SheetNames){
-      const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:""});
-      for(let i=0;i<Math.min(a.length,20);i++){const h=a[i].map(x=>String(x).trim().toLowerCase());if(h.includes("url")&&(h.some(x=>x.startsWith("doc"))||h.includes("file.name")||h.includes("name"))){rows=a;hi=i;H=h;break;}}
-      if(rows)break;
-    }
-    if(!rows)return msg("Could not find a header row with a URL column and a Doc Number or File.Name column.");
-    const col=(...names)=>H.findIndex(x=>names.some(n=>x===n||x.startsWith(n)));
-    const cu=col("url"),cn=col("doc number","doc no","document number","doc"),cr=col("rev"),cs=col("status"),ct=col("title");
-    const out=[];let note="";
-    if(cn<0){
-      /* SharePoint export: Title, File.Name, URL (and optionally Site). Doc number, rev and status come from the
-         built in register when the file name is on it, otherwise from the file name itself. Files with no title
-         from either source are left out as not official. */
-      const cname=H.indexOf("file.name")>=0?H.indexOf("file.name"):H.indexOf("name");
-      const byName=new Map(),titleByNum=new Map();
-      for(const x of BUILT.rows){if(x[0])byName.set(x[0].toLowerCase(),x);if(x[6]&&x[3])titleByNum.set(x[3].toUpperCase(),x[6]);}
-      let fromReg=0,fromName=0,regTitle=0,dropped=0,seen=new Set();
-      for(let i=hi+1;i<rows.length;i++){
-        const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";
-        const name=g(cname),url=g(cu);if(!name||!url||seen.has(url))continue;seen.add(url);
-        let t=g(ct);if(t.toLowerCase()==="null")t="";
-        let num,rev,st;const reg=byName.get(name.toLowerCase());
-        let rt=false;if(reg){num=reg[3];rev=reg[4];st=reg[5];if(!t&&reg[6]){t=reg[6];rt=true;}}
-        else{const p=name.replace(/\.[^.]+$/,"").split("_");num=p[0];rev=p[1]||"";st=p[2]&&/^[A-Za-z]{3}$/.test(p[2])?p[2].toUpperCase():"";
-          if(!t){const x=titleByNum.get(num.toUpperCase());if(x){t=x;rt=true;}}}
-        if(!t){dropped++;continue;}
-        reg?fromReg++:fromName++;if(rt)regTitle++;
-        out.push([name,url,num,rev,st,t]);
-      }
-      note=" "+fromReg.toLocaleString()+" matched the register by file name, "+fromName.toLocaleString()+" read from the file name, "+regTitle.toLocaleString()+" titles taken from the register, "+dropped.toLocaleString()+" left out with no title.";
-    }else{
-      const cf=H.findIndex((x,i)=>![cu,cn,cr,cs,ct].includes(i));
-      for(let i=hi+1;i<rows.length;i++){const r=rows[i];const g=c=>c>=0?String(r[c]??"").trim():"";if(!g(cu)&&!g(cn))continue;out.push([g(cf),g(cu),g(cn),g(cr),g(cs),g(ct)]);}
-    }
-    const pack={source:f.name+" (uploaded "+new Date().toLocaleDateString()+")",flat:out};
-    await idbPut(pack);useFlat(pack);builtIn=false;showSrc();apply();
-    msg("Loaded "+out.length.toLocaleString()+" rows from "+f.name+"."+note+" Ticks carry across by document number.");
-  }catch(err){msg("Could not read that file: "+err.message);}
-};
-function useFlat(p){ROWS=p.flat.map(x=>mk(x[0],x[1],x[2],x[3],x[4],x[5]));source=p.source;IDX=null;}
-$("resetBtn").onclick=async()=>{await idbPut(null);loadPacked(BUILT);IDX=null;builtIn=true;showSrc();apply();msg("Back on the built in register.");};
-function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.toLocaleString()+" items";$("resetBtn").style.display=builtIn?"none":"";}
+function showSrc(){$("src").textContent="Register: "+source+" | "+ROWS.length.toLocaleString()+" items"}
 
 /* start */
 const BUILT=JSON.parse($("data").textContent);
-loadPacked(BUILT);
+loadPacked(BUILT);buildTree();
 showSrc();updSel();apply();
-idbGet().then(p=>{if(p&&p.flat){useFlat(p);builtIn=false;showSrc();updSel();apply();}});
+idbPut(null); /* uploads were removed; drop any copy left from an earlier upload so everyone sees the built in register */
 })();
 </script>
 <script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
