@@ -112,7 +112,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <nav id="tree"><h3>Folders</h3><div id="treeBody"></div></nav>
   <div id="treeGrip" title="Drag to resize"></div>
   <aside id="side">
-    <label class="tog"><input type="checkbox" id="hideSup" checked> Hide superseded, cancelled and markups</label>
+    <label class="tog"><input type="checkbox" id="hideSup" checked> Hide superseded and cancelled</label>
+    <label class="tog" title="Red line and green line markups (RLM, GLM)"><input type="checkbox" id="hideMk"> Hide markups</label>
     <label class="tog"><input type="checkbox" id="onlyLink" checked> Only items with a link</label>
     <label class="tog"><input type="checkbox" id="onlySel"> Show ticked only</label>
     <div id="groups"></div>
@@ -164,7 +165,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 "use strict";
 const $=id=>document.getElementById(id);
 const LSK="pld_ticks_v1";
-const SUP_ST=new Set(["RLM","GLM","SSD","CAN"]);
+const SUP_ST=new Set(["SSD","CAN"]),MK_ST=new Set(["RLM","GLM"]);
 const GROUPS=[["st","Status"],["type","Doc type"],["disc","Discipline"],["area","Area"],["pkg","Package"],["lib","Library"],["ext","File type"]];
 const SHOW=14;
 let ROWS=[],shown=[],sortK="num",sortD=1,source="",builtIn=true;
@@ -192,10 +193,10 @@ function attrs(num,url,name){
 }
 function mk(name,url,num,rev,st,t){
   const a=attrs(num||name,url,name);
-  const sup=SUP_ST.has(st)||/\/superseded\//i.test(url)||/-(RLM|GLM)\d*$/i.test(num);
+  const sup=SUP_ST.has(st)||/\/superseded\//i.test(url),mk=MK_ST.has(st)||/-(RLM|GLM)\d*$/i.test(num);
   const key=num||name||url;
   const fm=url.replace(/:[a-z]:\/r\//,"").match(/\/Shared Documents\/(.*)\/[^/]*$/);
-  const r={name,u:url,num,rev,st,t,...a,sup,key,fp:fm?fm[1]:""};
+  const r={name,u:url,num,rev,st,t,...a,sup,mk,key,fp:fm?fm[1]:""};
   r.hay=[name,num,rev,st,t,url,a.area,a.pkg,a.type,a.disc,a.lib,a.ext].join(" \u0001 ").toLowerCase();
   return r;
 }
@@ -214,6 +215,7 @@ function linkOf(r,force){
 /* filtering */
 function baseOk(r,qt){
   if($("hideSup").checked&&r.sup)return false;
+  if($("hideMk").checked&&r.mk)return false;
   if($("onlyLink").checked&&!r.u)return false;
   if($("onlySel").checked&&!ticks.has(r.key))return false;
   for(const w of qt)if(!r.hay.includes(w))return false;
@@ -364,7 +366,7 @@ function copyTable(rs,noteId,what){
 $("copyView").onclick=()=>copyTable(shown,"copyNote","view");
 $("copyTicks").onclick=()=>copyTable(tickedRows(),"copyNote","ticked");
 let qT=0;$("q").addEventListener("input",()=>{clearTimeout(qT);qT=setTimeout(apply,160)});
-["hideSup","onlyLink","onlySel"].forEach(id=>$(id).addEventListener("change",apply));
+["hideSup","hideMk","onlyLink","onlySel"].forEach(id=>$(id).addEventListener("change",apply));
 
 /* messages */
 function msg(t){const m=$("msg");m.textContent=t||"";m.className=t?"on":"";}
@@ -487,7 +489,7 @@ function buildIdx(){
 }
 function pickLatest(c){
   const p=c.filter(r=>r.u);if(!p.length)return null;
-  p.sort((a,b)=>cmpRev(b.rev,a.rev)||(a.sup-b.sup));
+  p.sort((a,b)=>cmpRev(b.rev,a.rev)||((a.sup||a.mk)-(b.sup||b.mk)));
   return p[0];
 }
 function lookup(line){
