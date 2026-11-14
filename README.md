@@ -24,4 +24,4 @@ It reads each document from the Doc Register sheet and finds its SharePoint fold
 
 ## Ticking
 
-The tick box in the column header unticks everything shown when anything shown is ticked. When nothing shown is ticked, it ticks everything shown.
+The tick box in the column header clears every tick when anything is ticked, including ticks on rows the filters are hiding. It shows a dash whenever something is ticked. When nothing is ticked, it ticks everything shown.
