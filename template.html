@@ -391,14 +391,14 @@ function fire(r){
   const f=document.createElement("iframe");f.style.display="none";f.src=u;document.body.appendChild(f);setTimeout(()=>f.remove(),120000);return true;
 }
 function setProg(i,n){$("fill").style.width=(n?100*i/n:0)+"%";$("progT").textContent=n?i+" of "+n:"";}
-/* With a downloads folder chosen, two files download at a time and the next starts as soon as one finishes.
+/* With a downloads folder chosen, three files download at a time and the next starts as soon as one finishes.
    Chrome and Edge save to name.crdownload while downloading and rename to the real name when done,
    so a file counts as finished when its real name appears in the folder. */
-const SLOTS=2,sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const SLOTS=3,sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function listNames(){if(!dirH)return null;try{if(await dirH.queryPermission({mode:"read"})!=="granted")return null;const a=[];for await(const [n,h] of dirH.entries())if(h.kind==="file")a.push(n);return a;}catch(e){return null}}
 async function dirReady(){if(!dirH)return false;try{let p=await dirH.queryPermission({mode:"read"});if(p!=="granted")p=await dirH.requestPermission({mode:"read"});return p==="granted";}catch(e){return false}}
 const giveUp=r=>Math.max(120000,(r.size||0)/150);  /* move on after 2 min, or longer for big files (150 KB/s) */
-function endMsg(me){return "Done. "+me.list.length+" files requested."+(me.late?" "+me.late+" took too long to appear in the downloads folder, so the next one started anyway.":"")+" Check your downloads list (Ctrl+J) for any that did not arrive.";}
+function endMsg(me){return "Done. "+me.list.length+" files requested."+(me.missing?" "+me.missing+" never showed up in \""+dirH.name+"\".":"")+(me.failed?" "+me.failed+" stopped partway.":"")+(me.late?" "+me.late+" took too long, so the next one started anyway.":"")+" Check your downloads list (Ctrl+J) for any that did not arrive.";}
 function go(){run&&(run.dir?pump():stepGap());}
 async function pump(){
   const me=run;if(!me||me.paused||me.busy)return;me.busy=true;me.fly=me.fly||[];me.fin=me.fin||0;me.late=me.late||0;
@@ -416,13 +416,27 @@ async function pump(){
       if(run!==me||me.paused)return;
       const names=await listNames();
       if(!names){me.dir=false;me.fly=[];msg("Lost access to the downloads folder, so the rest will go out one by one with the gap.");stepGap();return;}
-      me.fly=me.fly.filter(f=>{const k=dirKey(f.r.name);const got=names.some(n=>!f.before.has(n)&&dirKey(n)===k);const late=!got&&Date.now()-f.t0>giveUp(f.r);if(late)me.late++;if(got||late){me.fin++;return false;}return true;});
+      const now=Date.now(),tmp=n=>/\.(crdownload|part|tmp)$/i.test(n);
+      const unconfirmed=names.some(n=>tmp(n)&&/^unconfirmed /i.test(n));
+      me.fly=me.fly.filter(f=>{
+        const k=dirKey(f.r.name),low=f.r.name.toLowerCase(),fresh=names.filter(n=>!f.before.has(n));
+        if(fresh.some(n=>dirKey(n)===k)){me.fin++;return false;}                       /* finished: real name is there */
+        const busy=fresh.some(n=>tmp(n)&&n.toLowerCase().startsWith(low));
+        if(busy){f.seen=true;return true;}                                              /* still downloading */
+        if(f.seen){me.fin++;me.failed=(me.failed||0)+1;return false;}                    /* temp file went away without the real one: cancelled or failed */
+        if(now-f.t0>20000&&!unconfirmed){me.fin++;me.missing=(me.missing||0)+1;return false;} /* never showed up in this folder */
+        if(now-f.t0>giveUp(f.r)){me.fin++;me.late++;return false;}
+        return true;});
+      if(me.missing&&me.missing===me.fin&&me.missing>=2){
+        me.dir=false;me.fly=[];
+        me.note="Files weren't arriving in the folder \""+dirH.name+"\", so the rest went out one by one. Set Chrome's download folder to that same folder (chrome://settings/downloads).";msg(me.note);
+        stepGap();return;}
     }
   }finally{me.busy=false;}
 }
 function stepGap(){
   if(!run||run.paused)return;
-  if(run.i>=run.list.length){finish("Done. "+run.list.length+" files requested. Check your downloads list (Ctrl+J) for any that did not arrive.");return;}
+  if(run.i>=run.list.length){finish((run.note?run.note+" ":"")+"Done. "+run.list.length+" files requested. Check your downloads list (Ctrl+J) for any that did not arrive.");return;}
   const r=run.list[run.i];
   if(!fire(r)){msg("The browser blocked the pop up. Allow pop ups for this page (icon at the right of the address bar), then click Resume.");pause();return;}
   done.add(r.key);run.i++;setProg(run.i,run.list.length);renderTable();
