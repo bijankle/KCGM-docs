@@ -339,8 +339,8 @@ sz.addEventListener("click",e=>{
   saveTicks();updSel();renderTable();
   if($("onlySel").checked)apply();
 });
-function updHdr(){const c=$("hdrChk");const linked=shown.filter(r=>r.u);const n=linked.filter(r=>ticks.has(r.key)).length;c.checked=linked.length>0&&n===linked.length;c.indeterminate=n>0&&n<linked.length;c.title=n?"Untick all "+n.toLocaleString()+" ticked here":"Tick all "+linked.length.toLocaleString()+" shown";}
-$("hdrChk").addEventListener("change",()=>{const n=shown.filter(r=>r.u&&ticks.has(r.key)).length;tickShown(n===0);});
+function updHdr(){const c=$("hdrChk");const linked=shown.filter(r=>r.u);const all=tickedRows().length;const n=linked.filter(r=>ticks.has(r.key)).length;c.checked=all>0&&linked.length>0&&n===linked.length&&n===all;c.indeterminate=all>0&&!c.checked;c.title=all?"Untick all "+all.toLocaleString()+" ticked, including any the filters hide":"Tick all "+linked.length.toLocaleString()+" shown";}
+$("hdrChk").addEventListener("change",()=>{if(tickedRows().length){ticks.clear();saveTicks();updSel();apply();}else tickShown(true);});
 function tickShown(on){
   const linked=shown.filter(r=>r.u);
   if(on&&linked.length>500&&!confirm("Tick all "+linked.length.toLocaleString()+" items shown?")){updHdr();return;}
